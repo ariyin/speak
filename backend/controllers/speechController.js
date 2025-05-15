@@ -31,6 +31,38 @@ const type = async (req, res) => {
     }
 };
 
+const video = async (req, res) => {
+    const { rehearsalId, videoUrl } = req.body;
+
+    try {
+        const rehearsal = await Rehearsal.findOneAndUpdate(
+            { _id: rehearsalId },
+            { videoUrl: videoUrl },
+            { new: true }
+        );
+        if (!rehearsal) {
+            return res.status(404).json({
+                success: false,
+                message: 'Rehearsal not found',
+            });
+        }
+
+        const link = rehearsal.videoUrl;
+        console.log('Video URL:', rehearsal);
+        res.status(200).json({
+            success: true,
+            videoUrl: link,
+        });
+    } catch (error) {
+        console.error('Error updating rehearsal:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+};
+
 module.exports = {
     type,
+    video,
 };

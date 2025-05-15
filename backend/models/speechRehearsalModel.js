@@ -23,6 +23,10 @@ const rehearsalSchema = new Schema({
         ref: 'Speech',
     },
     currentStep: Number,
+    videoUrl: {
+        type: String,
+        default: '',
+    },
 });
 
 const Speech = mongoose.model('Speech', speechSchema, 'speeches');
