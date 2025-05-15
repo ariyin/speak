@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useRef, useCallback } from "react";
 import VideoPlayer from "../components/VideoPlayer";
-import type { CloudinaryPlayer } from "../components/CloudinaryPlayerType";
+import type { CloudinaryPlayer } from "../lib/cloudinaryService";
 
 function Analysis() {
   const playerRef = useRef<CloudinaryPlayer | null>(null);

@@ -1,1 +1,49 @@
 @import "tailwindcss";
+
+@theme {
+  --font-gs: "General Sans", "sans-serif";
+  --font-manrope: "Manrope", "sans-serif";
+}
+
+@layer base {
+  /* === GENERAL SANS === */
+  @font-face {
+    font-family: "General Sans";
+    src: url("/assets/fonts/GeneralSans-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  /* === MANROPE === */
+  @font-face {
+    font-family: "Manrope";
+    src: url("/assets/fonts/Manrope-Bold.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  /* body {
+    @apply min-h-screen p-20;
+  } */
+
+  h1 {
+    @apply font-manrope text-4xl font-bold;
+  }
+
+  h2 {
+    @apply font-manrope text-3xl font-bold;
+  }
+
+  p {
+    @apply font-gs;
+  }
+
+  button {
+    @apply min-w-28 rounded-2xl border-2 border-solid bg-white p-3 hover:cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-300;
+  }
+}
+
+/* TODO: better hover effect lol */
+.selection-card {
+  @apply flex basis-1/2 items-center justify-center rounded-2xl border-2 border-solid p-36 hover:cursor-pointer;
+}
