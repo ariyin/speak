@@ -1,13 +1,7 @@
-// VideoPlayer.tsx
 import { useEffect, useRef, useState } from "react";
+import type { CloudinaryPlayer } from "../lib/cloudinaryService";
 import cloudinary from "cloudinary-video-player";
 import "cloudinary-video-player/cld-video-player.min.css";
-
-interface CloudinaryPlayer {
-  duration(): number;
-  currentTime(time: number): void;
-  dispose(): void;
-}
 
 interface VideoPlayerProps {
   onReady?: (player: CloudinaryPlayer) => void;
