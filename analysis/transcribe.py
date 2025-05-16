@@ -21,13 +21,10 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 async def upload_video(file: UploadFile = File(...)):
     # 1. Save uploaded video to disk
     file_id   = uuid.uuid4().hex
-    print("test", flush=True)
     video_path= UPLOAD_DIR / f"{file_id}{Path(file.filename).suffix}"
     with video_path.open("wb") as out:
         shutil.copyfileobj(file.file, out)
     
-    print("Here", flush=True)
-
     # 2. Extract audio → WAV @16 kHz mono
     audio_path = UPLOAD_DIR / f"{file_id}.wav"
     (
