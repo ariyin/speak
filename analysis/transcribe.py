@@ -2,6 +2,7 @@
 import shutil
 import uuid
 from pathlib import Path
+from transcript_analysis import analyze_transcript
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
@@ -20,10 +21,13 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 async def upload_video(file: UploadFile = File(...)):
     # 1. Save uploaded video to disk
     file_id   = uuid.uuid4().hex
+    print("test", flush=True)
     video_path= UPLOAD_DIR / f"{file_id}{Path(file.filename).suffix}"
     with video_path.open("wb") as out:
         shutil.copyfileobj(file.file, out)
     
+    print("Here", flush=True)
+
     # 2. Extract audio → WAV @16 kHz mono
     audio_path = UPLOAD_DIR / f"{file_id}.wav"
     (
@@ -54,4 +58,7 @@ async def upload_video(file: UploadFile = File(...)):
     except Exception:
         pass
 
-    return JSONResponse({"transcript": transcript})
+    # 5. Get WPM and filler word count from transcript
+    delivery_analysis = analyze_transcript(result)
+
+    return JSONResponse({"transcript": transcript, "transcript_analysis": delivery_analysis})
