@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { uploadFileToCloudinary } from "../lib/cloudinaryService";
 
 interface UploadModalProps {
@@ -6,12 +5,9 @@ interface UploadModalProps {
 }
 
 function UploadModal({ onRecorded }: UploadModalProps) {
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
-
   async function handleUpload(file: File) {
     try {
       const url = await uploadFileToCloudinary(file);
-      setVideoUrl(url);
       onRecorded(url);
     } catch (err) {
       console.error("Upload failed:", err);
@@ -19,33 +15,21 @@ function UploadModal({ onRecorded }: UploadModalProps) {
   }
 
   return (
-    <div id="dropbox">
-      <form className="my-form">
-        <div className="form_line">
-          <div className="form_controls">
-            <div className="upload_button_holder">
-              <input
-                type="file"
-                id="fileElem"
-                multiple
-                accept="video/*"
-                onChange={(e) => {
-                  const files = e.target.files;
-                  if (files?.[0]) {
-                    handleUpload(files[0]);
-                  }
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </form>
-      <div id="gallery">
-        {videoUrl && (
-          <img src={videoUrl} alt="Uploaded" style={{ width: "100px" }} />
-        )}
-      </div>
-    </div>
+    <label className="border-cherry font-gs hover:bg-cherry inline-block cursor-pointer rounded-2xl border-2 border-solid bg-white px-9 py-3 transition-colors hover:cursor-pointer hover:border-black hover:text-white disabled:cursor-default disabled:border-black disabled:bg-gray-400 disabled:hover:text-black">
+      choose file
+      <input
+        type="file"
+        id="fileElem"
+        accept="video/*"
+        className="hidden"
+        onChange={(e) => {
+          const files = e.target.files;
+          if (files?.[0]) {
+            handleUpload(files[0]);
+          }
+        }}
+      />
+    </label>
   );
 }
 

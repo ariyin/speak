@@ -17,7 +17,14 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
     let stream: MediaStream | null = null;
 
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
+      .getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          aspectRatio: 16 / 9,
+        },
+        audio: true,
+      })
       .then((mediaStream) => {
         stream = mediaStream;
         const preview = document.getElementById(
@@ -61,22 +68,30 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
   };
 
   return (
-    <div className="modal relative">
-      <video id="camera-preview" autoPlay muted />
+    <>
+      <video id="camera-preview" autoPlay muted className="relative" />
       <button onClick={onClose} className="absolute top-2 right-2">
         close
       </button>
-      <div className="absolute bottom-2 flex w-full items-center justify-center gap-3">
+      <div className="">
         {!recording ? (
           <button onClick={start}>start</button>
         ) : (
           <>
-            <button onClick={() => mediaRecorder?.pause()}>pause</button>
-            <button onClick={stop}>end</button>
+            {/* TODO: change this into an icon */}
+            <button
+              onClick={() => mediaRecorder?.pause()}
+              className="absolute bottom-2 left-1/2 -translate-x-1/2 transform"
+            >
+              pause
+            </button>
+            <button onClick={stop} className="absolute right-3 bottom-3">
+              end
+            </button>
           </>
         )}
       </div>
-    </div>
+    </>
   );
 }
 

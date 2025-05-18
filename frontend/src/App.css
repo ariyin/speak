@@ -3,6 +3,7 @@
 @theme {
   --font-gs: "General Sans", "sans-serif";
   --font-manrope: "Manrope", "sans-serif";
+  --color-cherry: #d20a2e;
 }
 
 @layer base {
@@ -22,16 +23,12 @@
     font-style: normal;
   }
 
-  /* body {
-    @apply min-h-screen p-20;
-  } */
-
   h1 {
-    @apply font-manrope text-4xl font-bold;
+    @apply font-manrope text-3xl font-bold;
   }
 
   h2 {
-    @apply font-manrope text-3xl font-bold;
+    @apply font-manrope text-2xl font-bold;
   }
 
   p {
@@ -39,11 +36,37 @@
   }
 
   button {
-    @apply min-w-28 rounded-2xl border-2 border-solid bg-white p-3 hover:cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-300;
+    @apply border-cherry font-gs hover:bg-cherry rounded-2xl border-2 border-solid bg-white px-9 py-3 transition-colors hover:cursor-pointer hover:border-black hover:text-white disabled:cursor-default disabled:border-black disabled:bg-gray-400 disabled:hover:text-black;
+  }
+
+  textarea {
+    @apply font-gs rounded-2xl border-2 border-black p-5 focus:border-black;
   }
 }
 
-/* TODO: better hover effect lol */
+/* ONLY TOP BUTTONS */
+.layout-t {
+  @apply grid h-screen w-screen grid-rows-[auto_1fr] items-center gap-y-8 p-8;
+}
+
+/* W TOP AND BOTTOM BUTTONS */
+.layout-tb {
+  @apply grid h-screen w-screen grid-rows-[auto_1fr_auto] items-center gap-y-8 p-8;
+}
+
 .selection-card {
-  @apply flex basis-1/2 items-center justify-center rounded-2xl border-2 border-solid p-36 hover:cursor-pointer;
+  @apply hover:bg-cherry flex basis-1/2 flex-col items-center justify-center gap-5 rounded-2xl border-2 border-solid text-center transition-colors hover:cursor-pointer hover:border-black hover:text-white;
+}
+
+.selected-card {
+  @apply bg-cherry border-2 border-black text-white;
+}
+
+.video-wrapper {
+  /* 56.25% is aspect ratio of 16:9 */
+  @apply relative w-full max-w-full overflow-hidden border-0 pt-[56.25%];
+}
+
+.video-wrapper video {
+  @apply absolute top-0 left-0 h-full w-full;
 }
