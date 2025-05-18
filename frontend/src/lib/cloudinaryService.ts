@@ -22,12 +22,7 @@ export async function uploadFileToCloudinary(file: File): Promise<string> {
       throw new Error("No secure_url returned from Cloudinary.");
     }
 
-    const transformedUrl = data.secure_url.replace(
-      "/upload/",
-      "/upload/w_150,c_scale/",
-    );
-
-    return transformedUrl;
+    return data.secure_url;
   } catch (error) {
     console.error("Error uploading the file:", error);
     throw error;

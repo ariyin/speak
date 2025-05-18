@@ -2,11 +2,13 @@ import { NavLink } from "react-router-dom";
 
 function Home() {
   return (
-    <div className="p-20">
-      <NavLink to="/type" className="flex w-full justify-end">
+    <div className="layout-t">
+      <NavLink to="/type" className="justify-self-end">
         <button>create new speech</button>
       </NavLink>
-      <h1>Home</h1>
+      <div className="justify-self-center">
+        <h1>no speeches available</h1>
+      </div>
     </div>
   );
 }
