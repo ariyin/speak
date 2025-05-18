@@ -2,10 +2,26 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
+import { uploadFileToCloudinary } from "../lib/cloudinaryService";
 
 function Video() {
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showRecorder, setShowRecorder] = useState(false);
+
+  const handleNext = async () => {
+    if (!videoFile) return;
+    const uploadedUrl = await uploadFileToCloudinary(videoFile);
+    // navigate or pass along uploadedUrl
+  };
+
+  function clearUpload() {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl); // release memory
+    }
+    setVideoFile(null);
+    setPreviewUrl(null);
+  }
 
   return (
     <div className="layout-tb">
@@ -17,19 +33,32 @@ function Video() {
           <h1>how do you want to upload your video?</h1>
           <div className="flex gap-5">
             {/* choose file */}
-            <UploadModal onRecorded={(url: string) => setVideoUrl(url)} />
-            <button onClick={() => setShowRecorder(true)}>record</button>
+            <UploadModal
+              onSelected={(file: File) => {
+                setVideoFile(file);
+                setPreviewUrl(URL.createObjectURL(file));
+              }}
+            />
+            <button
+              onClick={() => setShowRecorder((prev) => !prev)}
+              className={showRecorder ? "selected-button" : ""}
+            >
+              record
+            </button>
           </div>
         </div>
         <div className="video-wrapper">
           {showRecorder && (
             <RecordingModal
               onClose={() => setShowRecorder(false)}
-              onRecorded={(url: string) => setVideoUrl(url)}
+              onRecorded={(file: File) => {
+                setVideoFile(file);
+                setPreviewUrl(URL.createObjectURL(file));
+              }}
             />
           )}
           {/* uploaded video preview */}
-          {videoUrl && <video src={videoUrl} controls />}
+          {previewUrl && !showRecorder && <video src={previewUrl} controls />}
         </div>
       </div>
       <div className="flex justify-between">
@@ -37,8 +66,13 @@ function Video() {
         <NavLink to="/content">
           <button>back</button>
         </NavLink>
+        {videoFile && !showRecorder && (
+          <button onClick={clearUpload}>clear upload</button>
+        )}
         <NavLink to="/analysis">
-          <button disabled={!videoUrl}>next</button>
+          <button onClick={handleNext} disabled={!videoFile}>
+            next
+          </button>
         </NavLink>
       </div>
     </div>

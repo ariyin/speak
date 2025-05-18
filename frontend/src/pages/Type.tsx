@@ -38,7 +38,7 @@ function Type() {
           <div
             className={clsx(
               "selection-card",
-              selection.has("content") && "selected-card",
+              selection.has("content") && "selected-button",
             )}
             onClick={() => toggleSelection("content")}
           >
@@ -51,7 +51,7 @@ function Type() {
           <div
             className={clsx(
               "selection-card",
-              selection.has("delivery") && "selected-card",
+              selection.has("delivery") && "selected-button",
             )}
             onClick={() => toggleSelection("delivery")}
           >
