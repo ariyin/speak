@@ -58,13 +58,12 @@
   @apply hover:bg-cherry flex basis-1/2 flex-col items-center justify-center gap-5 rounded-2xl border-2 border-solid text-center transition-colors hover:cursor-pointer hover:border-black hover:text-white;
 }
 
-.selected-card {
+.selected-button {
   @apply bg-cherry border-2 border-black text-white;
 }
 
 .video-wrapper {
-  /* 56.25% is aspect ratio of 16:9 */
-  @apply relative w-full max-w-full overflow-hidden border-0 pt-[56.25%];
+  @apply relative aspect-video w-full;
 }
 
 .video-wrapper video {

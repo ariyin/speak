@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { uploadFileToCloudinary } from "../lib/cloudinaryService";
 
 interface RecordingModalProps {
   onClose: () => void;
-  onRecorded: (url: string) => void;
+  onRecorded: (file: File) => void;
 }
 
 function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
@@ -12,6 +11,7 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
   );
   const [recording, setRecording] = useState(false);
   const chunks = useRef<Blob[]>([]);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -42,8 +42,8 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
             type: "video/webm",
           });
 
-          const url = await uploadFileToCloudinary(file);
-          onRecorded(url);
+          onRecorded(file);
+          onClose();
         };
         setMediaRecorder(recorder);
       });
@@ -67,30 +67,52 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
     setRecording(false);
   };
 
+  const togglePause = () => {
+    if (!mediaRecorder) return;
+
+    if (isPaused) {
+      mediaRecorder.resume();
+      setIsPaused(false);
+    } else {
+      mediaRecorder.pause();
+      setIsPaused(true);
+    }
+  };
+
   return (
     <>
       <video id="camera-preview" autoPlay muted className="relative" />
-      <button onClick={onClose} className="absolute top-2 right-2">
-        close
-      </button>
-      <div className="">
-        {!recording ? (
-          <button onClick={start}>start</button>
-        ) : (
-          <>
-            {/* TODO: change this into an icon */}
-            <button
-              onClick={() => mediaRecorder?.pause()}
-              className="absolute bottom-2 left-1/2 -translate-x-1/2 transform"
-            >
-              pause
-            </button>
-            <button onClick={stop} className="absolute right-3 bottom-3">
-              end
-            </button>
-          </>
-        )}
-      </div>
+      {!recording ? (
+        <button onClick={start} className="absolute right-2 bottom-2">
+          start
+        </button>
+      ) : (
+        <>
+          <div
+            onClick={togglePause}
+            className="group border-cherry hover:bg-cherry absolute bottom-3 left-1/2 flex size-10 -translate-x-1/2 transform cursor-pointer items-center justify-center rounded-full border-2 bg-white transition-colors hover:border-black"
+          >
+            {isPaused ? (
+              // resume
+              <svg
+                viewBox="0 0 24 24"
+                className="size-5 fill-black transition-colors group-hover:fill-white"
+              >
+                <polygon points="8,5 19,12 8,19" />
+              </svg>
+            ) : (
+              // pause
+              <div className="flex space-x-1">
+                <div className="h-3.5 w-1 bg-black transition-colors group-hover:bg-white" />
+                <div className="h-3.5 w-1 bg-black transition-colors group-hover:bg-white" />
+              </div>
+            )}
+          </div>
+          <button onClick={stop} className="absolute right-2 bottom-2">
+            end
+          </button>
+        </>
+      )}
     </>
   );
 }
