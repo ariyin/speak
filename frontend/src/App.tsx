@@ -5,6 +5,7 @@ import Type from "./pages/Type";
 import Content from "./pages/Content";
 import Video from "./pages/Video";
 import Analysis from "./pages/Analysis";
+import Summary from "./pages/Summary";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/content" element={<Content />} />
         <Route path="/video" element={<Video />} />
         <Route path="/analysis" element={<Analysis />} />
+        <Route path="/summary" element={<Summary />} />
       </Routes>
     </Router>
   );
