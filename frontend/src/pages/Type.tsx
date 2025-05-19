@@ -7,7 +7,7 @@ import axios from "axios";
 function Type() {
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
-    
+
   const toggleSelection = (type: string) => {
     setSelection((prev) => {
       const newSet = new Set(prev);
@@ -22,8 +22,8 @@ function Type() {
 
   // determine the next route based on the selection
   const getNextRoute = () => {
-    if (selection.has("delivery")) return "/video";
     if (selection.has("content")) return "/content";
+    if (selection.has("delivery")) return "/video";
     return "#"; // fallback if nothing selected
   };
 

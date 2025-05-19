@@ -11,11 +11,11 @@ function Home() {
       const response = await axios.post("http://localhost:8000/speech", {
         speech: {
           userId: userId,
-          rehearsals: [], // this will be updated with the rehearsal ID after creation
+          rehearsals: [],
         },
         rehearsal: {
-          analysis: "",
-          speech: "", // this will also be updated with the speech ID after creation
+          analysis: [],
+          speech: "", // temporary ObjectId
           videoUrl: "",
         },
       });
