@@ -29,8 +29,9 @@ export const addSpeech = (speechId: string) => {
 };
 
 export const addRehearsal = (rehearsalId: string) => {
-  const currentRehearsal = localStorage.getItem("currentRehearsal");
-  if (!currentRehearsal) {
-    localStorage.setItem("currentRehearsal", rehearsalId);
-  }
+  localStorage.setItem("currentRehearsal", rehearsalId);
+};
+
+export const getCurrentRehearsal = () => {
+  return localStorage.getItem("currentRehearsal");
 };

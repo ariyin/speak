@@ -7,7 +7,7 @@ from typing_extensions import Annotated
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 class RehearsalSchema(BaseModel):
-    analysis: str = Field(...)
+    analysis: List[str] = []
     speech: PyObjectId
     videoUrl: Optional[str] = None
 
@@ -17,6 +17,7 @@ class RehearsalSchema(BaseModel):
         json_encoders = {ObjectId: str}
 
 class UpdateRehearsalSchema(BaseModel):
+    analysis: Optional[List[str]] = None
     videoUrl: Optional[str] = None
 
     class Config:
@@ -24,11 +25,8 @@ class UpdateRehearsalSchema(BaseModel):
         json_encoders = {ObjectId: str}
 
 def ResponseModel(data, message):
-    return {
-        "data": [data],
-        "code": 200,
-        "message": message,
-    }
+    data.update({"code": 200, "message": message})
+    return data
 
 
 def ErrorResponseModel(error, code, message):
