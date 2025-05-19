@@ -7,6 +7,7 @@ import axios from "axios";
 function Type() {
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
+    
   const toggleSelection = (type: string) => {
     setSelection((prev) => {
       const newSet = new Set(prev);
