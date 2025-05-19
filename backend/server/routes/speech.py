@@ -19,5 +19,9 @@ async def add_speech_data(speech: SpeechSchema = Body(...), rehearsal: Rehearsal
     rehearsal_data = jsonable_encoder(rehearsal)
     new_rehearsal = await add_rehearsal(rehearsal_data)
     await connect_speech_rehearsal(new_speech["id"], new_rehearsal["id"])
-    return ResponseModel(new_speech, "Speech added successfully.")
+    data = {
+        "speech": new_speech,
+        "rehearsal": new_rehearsal
+    }
+    return ResponseModel(data, "Speech added successfully.")
 
