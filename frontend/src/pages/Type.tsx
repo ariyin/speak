@@ -30,7 +30,7 @@ function Type() {
     const rehearsalId = getCurrentRehearsal();
 
     const response = await axios.patch(
-      `http://localhost:8000/rehearsal/${rehearsalId}`,
+      `http://localhost:8000/rehearsal/type/${rehearsalId}`,
       {
         analysis: Array.from(selection),
       },

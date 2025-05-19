@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Literal, Dict
 from bson import ObjectId
 from pydantic.functional_validators import BeforeValidator
 from pydantic import BaseModel, Field
@@ -10,6 +10,7 @@ class RehearsalSchema(BaseModel):
     analysis: List[str] = []
     speech: PyObjectId
     videoUrl: Optional[str] = None
+    content: Optional[Dict[str, str]] = None
 
     class Config:
         populate_by_name = True
@@ -19,6 +20,7 @@ class RehearsalSchema(BaseModel):
 class UpdateRehearsalSchema(BaseModel):
     analysis: Optional[List[str]] = None
     videoUrl: Optional[str] = None
+    content: Optional[Dict[str, str]] = None
 
     class Config:
         arbitrary_types_allowed = True

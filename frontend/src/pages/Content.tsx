@@ -1,6 +1,38 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { getCurrentRehearsal } from "../utils/auth";
+import axios from "axios";
 
 function Content() {
+  const [content, setContent] = useState("");
+  const [contentType, setContentType] = useState<"speech" | "outline" | null>(
+    null,
+  );
+  const navigate = useNavigate();
+
+  const handleNext = async () => {
+    if (!content || !contentType) return;
+
+    const rehearsalId = getCurrentRehearsal();
+    try {
+      const response = await axios.patch(
+        `http://localhost:8000/rehearsal/content/${rehearsalId}`,
+        {
+          content: {
+            type: contentType,
+            text: content,
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        navigate("/video");
+      }
+    } catch (error) {
+      console.error("Failed to update content:", error);
+    }
+  };
+
   return (
     <div className="layout-tb">
       <NavLink to="/" className="justify-self-end">
@@ -10,12 +42,23 @@ function Content() {
         <div className="flex flex-col items-center gap-5 text-center">
           <h1>what are you uploading?</h1>
           <div className="flex gap-5">
-            {/* TODO: clicking logic */}
-            <button>speech</button>
-            <button>outline</button>
+            <button
+              className={contentType === "speech" ? "selected-button" : ""}
+              onClick={() => setContentType("speech")}
+            >
+              speech
+            </button>
+            <button
+              className={contentType === "outline" ? "selected-button" : ""}
+              onClick={() => setContentType("outline")}
+            >
+              outline
+            </button>
           </div>
         </div>
         <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           placeholder="input text here..."
           className="h-full w-full focus:outline-none"
         />
@@ -24,10 +67,9 @@ function Content() {
         <NavLink to="/type">
           <button>back</button>
         </NavLink>
-        <NavLink to="/video">
-          {/* TODO: disable if content is required */}
-          <button>next</button>
-        </NavLink>
+        <button onClick={handleNext} disabled={!content || !contentType}>
+          next
+        </button>
       </div>
     </div>
   );
