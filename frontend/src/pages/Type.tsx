@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import clsx from "clsx";
+import { getCurrentRehearsal } from "../utils/auth";
+import axios from "axios";
 
 function Type() {
   const [selection, setSelection] = useState<Set<string>>(new Set());
-
+  const navigate = useNavigate();
+    
   const toggleSelection = (type: string) => {
     setSelection((prev) => {
       const newSet = new Set(prev);
@@ -22,6 +25,23 @@ function Type() {
     if (selection.has("delivery")) return "/video";
     if (selection.has("content")) return "/content";
     return "#"; // fallback if nothing selected
+  };
+
+  const handleNext = async () => {
+    const rehearsalId = getCurrentRehearsal();
+
+    const response = await axios.patch(
+      `http://localhost:8000/rehearsal/type/${rehearsalId}`,
+      {
+        analysis: Array.from(selection),
+      },
+    );
+
+    if (response.status === 200) {
+      navigate(getNextRoute());
+    } else {
+      console.error("Failed to update rehearsal");
+    }
   };
 
   return (
@@ -63,9 +83,13 @@ function Type() {
           </div>
         </div>
       </div>
-      <NavLink to={getNextRoute()} className="justify-self-end">
-        <button disabled={selection.size === 0}>next</button>
-      </NavLink>
+      <button
+        className="justify-self-end"
+        disabled={selection.size === 0}
+        onClick={handleNext}
+      >
+        next
+      </button>
     </div>
   );
 }
