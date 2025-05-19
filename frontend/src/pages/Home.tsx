@@ -8,7 +8,7 @@ function Home() {
   const handleCreateSpeech = async () => {
     try {
       const userId = getUserId();
-      const response = await axios.post("http://localhost:8000/speech", {
+      const response = await axios.post("http://localhost:8000/speech/", {
         speech: {
           userId: userId,
           rehearsals: [],

@@ -4,18 +4,40 @@ designed to ease public speaking anxiety and boost your confidence. get targeted
 
 ## setup
 
-to run the frontend:
+### frontend
 
-```
+to run:
+
+```bash
 cd frontend
 npm run dev
 ```
 
 create a `.env` file in `/frontend` with the following:
 
-```
+```env
 VITE_CLOUD_NAME=
 VITE_UPLOAD_PRESET=
+```
+
+### backend
+
+to run:
+
+```bash
+cd backend
+python -m venv venv # create a virtual environment
+source venv/bin/activate # on windows: venv\Scripts\activate
+pip install --upgrade pip  # make sure pip is up to date
+pip install -r requirements.txt
+python3 main.py
+```
+
+create a `.env` file in `/backend` with the following:
+
+```env
+MONGODB_URL=mongodb+srv://<db_username>:<db_password>@cluster0.wddsg5v.mongodb.net/PublicSpeaking?retryWrites=true&w=majority&appName=Cluster0
+PORT=8000
 ```
 
 ## usage
