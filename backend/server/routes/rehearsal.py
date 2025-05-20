@@ -4,6 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from server.database import (
     update_rehearsal,
     add_rehearsal,
+    retrieve_rehearsal,
+    delete_rehearsal,
 )
 
 from server.models.rehearsal import UpdateRehearsalSchema, ResponseModel, ErrorResponseModel, RehearsalSchema
@@ -33,3 +35,15 @@ async def add_rehearsal_data(rehearsal: RehearsalSchema = Body(...)):
     rehearsal_data = jsonable_encoder(rehearsal)
     new_rehearsal = await add_rehearsal(rehearsal_data)
     return ResponseModel(new_rehearsal, "Rehearsal added successfully.")
+
+@router.get("/{id}", response_description="Rehearsal fetched from the database")
+async def get_rehearsal_data(id: str):
+    new_rehearsal = await retrieve_rehearsal(id)
+    return ResponseModel(new_rehearsal, "Rehearsal added successfully.")
+
+@router.delete("/{id}", response_description="Rehearsal deleted from the database")
+async def delete_rehearsal_data(id: str):
+    deleted = await delete_rehearsal(id)
+    if deleted:
+        return ResponseModel({}, "Rehearsal deleted successfully.")
+    return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")

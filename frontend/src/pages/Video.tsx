@@ -4,6 +4,12 @@ import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
 import { uploadFileToCloudinary } from "../utils/cloudinaryService";
 import axios from "axios";
+import {
+  deleteSpeech,
+  deleteCurrentRehearsal,
+  getCurrentRehearsal,
+  getCurrentSpeech,
+} from "../utils/auth";
 
 function Video() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -16,7 +22,6 @@ function Video() {
     // Fetch the rehearsal data to determine the back route
     const fetchRehearsalData = async () => {
       try {
-        // TODO: implement this endpoint
         const response = await axios.get(
           `http://localhost:8000/rehearsal/${rehearsalId}`,
         );
@@ -53,11 +58,37 @@ function Video() {
     setPreviewUrl(null);
   }
 
+  const handleExit = async () => {
+    try {
+      const rehearsalId = getCurrentRehearsal();
+      const speechId = getCurrentSpeech();
+
+      if (!rehearsalId || !speechId) {
+        throw new Error("No rehearsal or speech ID found");
+      }
+
+      const rehearsalDeleted = await axios.delete(
+        `http://localhost:8000/rehearsal/${rehearsalId}`,
+      );
+      const speechDeleted = await axios.delete(
+        `http://localhost:8000/speech/${speechId}`,
+      );
+
+      if (rehearsalDeleted.status === 200 && speechDeleted.status === 200) {
+        deleteCurrentRehearsal();
+        deleteSpeech(speechId);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error deleting speech:", error);
+    }
+  };
+
   return (
     <div className="layout-tb">
-      <NavLink to="/" className="justify-self-end">
-        <button>exit</button>
-      </NavLink>
+      <button onClick={handleExit} className="justify-self-end">
+        exit
+      </button>
       <div className="grid h-full grid-rows-[auto_1fr] justify-center gap-8">
         <div className="flex flex-col items-center gap-5 text-center">
           <h1>how do you want to upload your video?</h1>

@@ -1,6 +1,12 @@
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import {
+  deleteSpeech,
+  deleteCurrentRehearsal,
+  getCurrentRehearsal,
+  getCurrentSpeech,
+} from "../utils/auth";
 
 function Content() {
   const [content, setContent] = useState("");
@@ -32,11 +38,37 @@ function Content() {
     }
   };
 
+  const handleExit = async () => {
+    try {
+      const rehearsalId = getCurrentRehearsal();
+      const speechId = getCurrentSpeech();
+
+      if (!rehearsalId || !speechId) {
+        throw new Error("No rehearsal or speech ID found");
+      }
+
+      const rehearsalDeleted = await axios.delete(
+        `http://localhost:8000/rehearsal/${rehearsalId}`,
+      );
+      const speechDeleted = await axios.delete(
+        `http://localhost:8000/speech/${speechId}`,
+      );
+
+      if (rehearsalDeleted.status === 200 && speechDeleted.status === 200) {
+        deleteCurrentRehearsal();
+        deleteSpeech(speechId);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error deleting speech:", error);
+    }
+  };
+
   return (
     <div className="layout-tb">
-      <NavLink to="/" className="justify-self-end">
-        <button>exit</button>
-      </NavLink>
+      <button onClick={handleExit} className="justify-self-end">
+        exit
+      </button>
       <div className="flex h-full w-full max-w-4/5 flex-col gap-8 justify-self-center">
         <div className="flex flex-col items-center gap-5 text-center">
           <h1>what are you uploading?</h1>

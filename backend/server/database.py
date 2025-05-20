@@ -56,9 +56,9 @@ async def update_speech(speech_id: str, data: dict) -> bool:
         return False
 
 async def delete_speech(speech_id: str) -> bool:  
-    speech = speech_collection.find_one({"_id": ObjectId(speech_id)})
+    speech = await speech_collection.find_one({"_id": ObjectId(speech_id)})
     if speech:
-        speech_collection.delete_one({"_id": ObjectId(speech_id)})
+        await speech_collection.delete_one({"_id": ObjectId(speech_id)})
         return True
     return False
 
@@ -68,7 +68,7 @@ def rehearsal_helper(rehearsal) -> dict:
     return {
         "id": str(rehearsal["_id"]),
         "analysis": rehearsal["analysis"],
-        "speech": rehearsal["speech"],
+        "speech": str(rehearsal["speech"]),
         "videoUrl": rehearsal["videoUrl"],
     }
 
@@ -84,7 +84,7 @@ async def retrieve_rehearsals(speech_id: str) -> list:
     return rehearsals
 
 async def retrieve_rehearsal(rehearsal_id: str) -> dict:
-    rehearsal = rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})
+    rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})
     if rehearsal:
         return rehearsal_helper(rehearsal)
     return None
@@ -100,8 +100,8 @@ async def update_rehearsal(rehearsal_id: str, data: dict) -> bool:
         return False
     
 async def delete_rehearsal(rehearsal_id: str) -> bool:
-    rehearsal = rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})
+    rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})
     if rehearsal:
-        rehearsal_collection.delete_one({"_id": ObjectId(rehearsal_id)})
+        await rehearsal_collection.delete_one({"_id": ObjectId(rehearsal_id)})
         return True
     return False

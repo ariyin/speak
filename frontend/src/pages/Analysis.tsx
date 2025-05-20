@@ -2,7 +2,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useCallback } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import type { CloudinaryPlayer } from "../utils/cloudinaryService";
-import { addRehearsal, getCurrentSpeech } from "../utils/auth";
+import {
+  addRehearsal,
+  getCurrentRehearsal,
+  getCurrentSpeech,
+  deleteCurrentRehearsal,
+  deleteSpeech,
+} from "../utils/auth";
 import axios from "axios";
 
 function Analysis() {
@@ -13,7 +19,6 @@ function Analysis() {
     try {
       // Create a new rehearsal for the same speech
       const speechId = getCurrentSpeech();
-      // TODO: create this endpoint
       const response = await axios.post("http://localhost:8000/rehearsal/", {
         speech: speechId,
       });
@@ -40,11 +45,37 @@ function Analysis() {
     }
   };
 
+  const handleExit = async () => {
+    try {
+      const rehearsalId = getCurrentRehearsal();
+      const speechId = getCurrentSpeech();
+
+      if (!rehearsalId || !speechId) {
+        throw new Error("No rehearsal or speech ID found");
+      }
+
+      const rehearsalDeleted = await axios.delete(
+        `http://localhost:8000/rehearsal/${rehearsalId}`,
+      );
+      const speechDeleted = await axios.delete(
+        `http://localhost:8000/speech/${speechId}`,
+      );
+
+      if (rehearsalDeleted.status === 200 && speechDeleted.status === 200) {
+        deleteCurrentRehearsal();
+        deleteSpeech(speechId);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error deleting speech:", error);
+    }
+  };
+
   return (
     <div className="layout-tb">
-      <NavLink to="/" className="justify-self-end">
-        <button>exit</button>
-      </NavLink>
+      <button onClick={handleExit} className="justify-self-end">
+        exit
+      </button>
       <div className="grid h-full grid-cols-2 gap-4">
         <div>
           {/* Jump to Middle button is here, outside of VideoPlayer */}

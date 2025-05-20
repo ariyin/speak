@@ -1,7 +1,12 @@
 import { useState } from "react";
-import { useNavigate, NavLink, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import clsx from "clsx";
-import { getCurrentRehearsal } from "../utils/auth";
+import {
+  deleteCurrentRehearsal,
+  deleteSpeech,
+  getCurrentRehearsal,
+  getCurrentSpeech,
+} from "../utils/auth";
 import axios from "axios";
 
 function Type() {
@@ -45,11 +50,37 @@ function Type() {
     }
   };
 
+  const handleExit = async () => {
+    try {
+      const rehearsalId = getCurrentRehearsal();
+      const speechId = getCurrentSpeech();
+
+      if (!rehearsalId || !speechId) {
+        throw new Error("No rehearsal or speech ID found");
+      }
+
+      const rehearsalDeleted = await axios.delete(
+        `http://localhost:8000/rehearsal/${rehearsalId}`,
+      );
+      const speechDeleted = await axios.delete(
+        `http://localhost:8000/speech/${speechId}`,
+      );
+
+      if (rehearsalDeleted.status === 200 && speechDeleted.status === 200) {
+        deleteCurrentRehearsal();
+        deleteSpeech(speechId);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error deleting speech:", error);
+    }
+  };
+
   return (
     <div className="layout-tb">
-      <NavLink to="/" className="justify-self-end">
-        <button>exit</button>
-      </NavLink>
+      <button onClick={handleExit} className="justify-self-end">
+        exit
+      </button>
       <div className="flex h-full max-w-4/5 flex-col gap-10 justify-self-center">
         <div className="text-center">
           <h1>what type of analysis are you looking for?</h1>

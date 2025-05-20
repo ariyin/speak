@@ -5,6 +5,7 @@ from server.database import (
     add_speech,
     add_rehearsal,
     connect_speech_rehearsal,
+    delete_speech,
 )
 from server.models.speech import (SpeechSchema,     ErrorResponseModel,
     ResponseModel,)
@@ -24,4 +25,11 @@ async def add_speech_data(speech: SpeechSchema = Body(...), rehearsal: Rehearsal
         "rehearsal": new_rehearsal
     }
     return ResponseModel(data, "Speech added successfully.")
+
+@router.delete("/{id}", response_description="Speech deleted from the database")
+async def delete_speech_data(id: str):
+    deleted = await delete_speech(id)
+    if deleted:
+        return ResponseModel({}, "Speech deleted successfully.")
+    return ErrorResponseModel("An error occurred.", 404, "Speech not found")
 
