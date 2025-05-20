@@ -21,7 +21,7 @@ function Home() {
       });
       addSpeech(response.data.speech.id);
       addRehearsal(response.data.rehearsal.id);
-      navigate("/type");
+      navigate(`/rehearsal/${response.data.rehearsal.id}/type`);
     } catch (error) {
       console.error("Error creating speech:", error);
       // TODO: Handle error

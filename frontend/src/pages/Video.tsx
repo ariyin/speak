@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
 import { uploadFileToCloudinary } from "../lib/cloudinaryService";
@@ -8,6 +8,7 @@ function Video() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showRecorder, setShowRecorder] = useState(false);
+  const { rehearsalId } = useParams();
 
   const handleNext = async () => {
     if (!videoFile) return;
@@ -63,13 +64,13 @@ function Video() {
       </div>
       <div className="flex justify-between">
         {/* TODO: make dynamic based on path */}
-        <NavLink to="/content">
+        <NavLink to={`/rehearsal/${rehearsalId}/content`}>
           <button>back</button>
         </NavLink>
         {videoFile && !showRecorder && (
           <button onClick={clearUpload}>clear upload</button>
         )}
-        <NavLink to="/analysis">
+        <NavLink to={`/rehearsal/${rehearsalId}/analysis`}>
           <button onClick={handleNext} disabled={!videoFile}>
             next
           </button>

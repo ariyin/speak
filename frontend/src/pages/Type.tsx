@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useParams } from "react-router-dom";
 import clsx from "clsx";
 import { getCurrentRehearsal } from "../utils/auth";
 import axios from "axios";
@@ -7,6 +7,7 @@ import axios from "axios";
 function Type() {
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
+  const { rehearsalId } = useParams();
 
   const toggleSelection = (type: string) => {
     setSelection((prev) => {
@@ -22,8 +23,8 @@ function Type() {
 
   // determine the next route based on the selection
   const getNextRoute = () => {
-    if (selection.has("content")) return "/content";
-    if (selection.has("delivery")) return "/video";
+    if (selection.has("content")) return `/rehearsal/${rehearsalId}/content`;
+    if (selection.has("delivery")) return `/rehearsal/${rehearsalId}/video`;
     return "#"; // fallback if nothing selected
   };
 

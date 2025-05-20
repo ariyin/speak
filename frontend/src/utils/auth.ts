@@ -28,6 +28,10 @@ export const addSpeech = (speechId: string) => {
   localStorage.setItem("currentSpeech", speechId);
 };
 
+export const getCurrentSpeech = () => {
+  return localStorage.getItem("currentSpeech");
+};
+
 export const addRehearsal = (rehearsalId: string) => {
   localStorage.setItem("currentRehearsal", rehearsalId);
 };

@@ -1,10 +1,40 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useCallback } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import type { CloudinaryPlayer } from "../lib/cloudinaryService";
+import { addRehearsal, getCurrentSpeech } from "../utils/auth";
+import axios from "axios";
 
 function Analysis() {
   const playerRef = useRef<CloudinaryPlayer | null>(null);
+  const navigate = useNavigate();
+
+  const handleRehearseAgain = async () => {
+    try {
+      // Create a new rehearsal for the same speech
+      const speechId = getCurrentSpeech();
+      // TODO: create this endpoint
+      const response = await axios.post(
+        "http://localhost:8000/speech/rehearsal",
+        {
+          speechId,
+          rehearsal: {
+            analysis: [],
+            speech: speechId,
+            videoUrl: "",
+          },
+        },
+      );
+
+      // Update current rehearsal in localStorage
+      addRehearsal(response.data.rehearsal.id);
+
+      // Navigate to the type page for the new rehearsal
+      navigate(`/rehearsal/${response.data.rehearsal.id}/type`);
+    } catch (error) {
+      console.error("Error creating new rehearsal:", error);
+    }
+  };
 
   const handleReady = useCallback((player: CloudinaryPlayer) => {
     playerRef.current = player;
@@ -36,10 +66,9 @@ function Analysis() {
         </div>
       </div>
       <div className="flex justify-end gap-4">
-        <NavLink to="/type">
-          <button>rehearse again</button>
-        </NavLink>
-        <NavLink to="/summary">
+        <button onClick={handleRehearseAgain}>rehearse again</button>
+        {/* TODO: do we want a summary of their current run or everything */}
+        <NavLink to={`/speech/${getCurrentSpeech()}/summary`}>
           <button>finish</button>
         </NavLink>
       </div>

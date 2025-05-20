@@ -1,6 +1,5 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
-import { getCurrentRehearsal } from "../utils/auth";
 import axios from "axios";
 
 function Content() {
@@ -9,11 +8,11 @@ function Content() {
     null,
   );
   const navigate = useNavigate();
+  const { rehearsalId } = useParams();
 
   const handleNext = async () => {
     if (!content || !contentType) return;
 
-    const rehearsalId = getCurrentRehearsal();
     try {
       const response = await axios.patch(
         `http://localhost:8000/rehearsal/content/${rehearsalId}`,
@@ -26,7 +25,7 @@ function Content() {
       );
 
       if (response.status === 200) {
-        navigate("/video");
+        navigate(`/rehearsal/${rehearsalId}/video`);
       }
     } catch (error) {
       console.error("Failed to update content:", error);
@@ -64,7 +63,7 @@ function Content() {
         />
       </div>
       <div className="flex justify-between">
-        <NavLink to="/type">
+        <NavLink to={`/rehearsal/${rehearsalId}/type`}>
           <button>back</button>
         </NavLink>
         <button onClick={handleNext} disabled={!content || !contentType}>
