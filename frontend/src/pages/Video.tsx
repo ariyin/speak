@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
-import { uploadFileToCloudinary } from "../lib/cloudinaryService";
+import { uploadFileToCloudinary } from "../utils/cloudinaryService";
 import axios from "axios";
 
 function Video() {

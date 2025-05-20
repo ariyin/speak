@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { CloudinaryPlayer } from "../lib/cloudinaryService";
+import type { CloudinaryPlayer } from "../utils/cloudinaryService";
 import cloudinary from "cloudinary-video-player";
 import "cloudinary-video-player/cld-video-player.min.css";
 

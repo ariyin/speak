@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useCallback } from "react";
 import VideoPlayer from "../components/VideoPlayer";
-import type { CloudinaryPlayer } from "../lib/cloudinaryService";
+import type { CloudinaryPlayer } from "../utils/cloudinaryService";
 import { addRehearsal, getCurrentSpeech } from "../utils/auth";
 import axios from "axios";
 
