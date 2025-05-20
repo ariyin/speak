@@ -3,9 +3,10 @@ from fastapi.encoders import jsonable_encoder
 
 from server.database import (
     update_rehearsal,
+    add_rehearsal,
 )
 
-from server.models.rehearsal import UpdateRehearsalSchema, ResponseModel, ErrorResponseModel
+from server.models.rehearsal import UpdateRehearsalSchema, ResponseModel, ErrorResponseModel, RehearsalSchema
 
 router = APIRouter()
 
@@ -26,3 +27,9 @@ async def update_rehearsal_content(id: str, req: UpdateRehearsalSchema = Body(..
         res = { "response": "Rehearsal {} updated succesfully".format(id)}
         return ResponseModel(res, "Rehearsal updated successfully.")
     return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
+
+@router.post("/", response_description="Rehearsal added into the database")
+async def add_rehearsal_data(rehearsal: RehearsalSchema = Body(...)):
+    rehearsal_data = jsonable_encoder(rehearsal)
+    new_rehearsal = await add_rehearsal(rehearsal_data)
+    return ResponseModel(new_rehearsal, "Rehearsal added successfully.")

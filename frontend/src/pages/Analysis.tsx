@@ -1,11 +1,13 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useRef, useCallback } from "react";
 import VideoPlayer from "../components/VideoPlayer";
 import type { CloudinaryPlayer } from "../lib/cloudinaryService";
+import { getCurrentSpeech, addRehearsal } from "../utils/auth";
+import axios from "axios";
 
 function Analysis() {
   const playerRef = useRef<CloudinaryPlayer | null>(null);
-
+  const navigate = useNavigate();
   const handleReady = useCallback((player: CloudinaryPlayer) => {
     playerRef.current = player;
   }, []);
@@ -15,6 +17,19 @@ function Analysis() {
     if (player) {
       const middle = player.duration() / 4;
       player.currentTime(middle);
+    }
+  };
+
+  const handleReheaseAgain = async () => {
+    const speechId = getCurrentSpeech();
+    const response = await axios.post("http://localhost:8000/rehearsal/", {
+      speech: speechId,
+    });
+
+    if (response.status === 200) {
+      const rehearsalId = response.data.id;
+      addRehearsal(rehearsalId);
+      navigate("/type");
     }
   };
 
@@ -36,9 +51,7 @@ function Analysis() {
         </div>
       </div>
       <div className="flex justify-end gap-4">
-        <NavLink to="/type">
-          <button>rehearse again</button>
-        </NavLink>
+        <button onClick={handleReheaseAgain}>rehearse again</button>
         <NavLink to="/summary">
           <button>finish</button>
         </NavLink>
