@@ -43,8 +43,8 @@ async def add_rehearsal_data(rehearsal: RehearsalSchema = Body(...)):
 
 @router.get("/{id}", response_description="Rehearsal fetched from the database")
 async def get_rehearsal_data(id: str):
-    new_rehearsal = await retrieve_rehearsal(id)
-    return ResponseModel(new_rehearsal, "Rehearsal added successfully.")
+    rehearsal = await retrieve_rehearsal(id)
+    return ResponseModel(rehearsal, "Rehearsal fetched successfully.")
 
 @router.delete("/{id}", response_description="Rehearsal deleted from the database")
 async def delete_rehearsal_data(id: str):

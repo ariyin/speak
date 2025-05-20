@@ -4,12 +4,7 @@ import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
 import { uploadFileToCloudinary } from "../utils/cloudinaryService";
 import axios from "axios";
-import {
-  deleteSpeech,
-  deleteCurrentRehearsal,
-  getCurrentRehearsal,
-  getCurrentSpeech,
-} from "../utils/auth";
+import ExitButton from "../components/ExitButton";
 
 function Video() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -58,37 +53,9 @@ function Video() {
     setPreviewUrl(null);
   }
 
-  const handleExit = async () => {
-    try {
-      const rehearsalId = getCurrentRehearsal();
-      const speechId = getCurrentSpeech();
-
-      if (!rehearsalId || !speechId) {
-        throw new Error("No rehearsal or speech ID found");
-      }
-
-      const rehearsalDeleted = await axios.delete(
-        `http://localhost:8000/rehearsal/${rehearsalId}`,
-      );
-      const speechDeleted = await axios.delete(
-        `http://localhost:8000/speech/${speechId}`,
-      );
-
-      if (rehearsalDeleted.status === 200 && speechDeleted.status === 200) {
-        deleteCurrentRehearsal();
-        deleteSpeech(speechId);
-        navigate("/");
-      }
-    } catch (error) {
-      console.error("Error deleting speech:", error);
-    }
-  };
-
   return (
     <div className="layout-tb">
-      <button onClick={handleExit} className="justify-self-end">
-        exit
-      </button>
+      <ExitButton />
       <div className="grid h-full grid-rows-[auto_1fr] justify-center gap-8">
         <div className="flex flex-col items-center gap-5 text-center">
           <h1>how do you want to upload your video?</h1>
