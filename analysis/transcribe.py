@@ -2,6 +2,7 @@
 import shutil
 import uuid
 from pathlib import Path
+from transcript_analysis import analyze_transcript
 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
@@ -54,4 +55,7 @@ async def upload_video(file: UploadFile = File(...)):
     except Exception:
         pass
 
-    return JSONResponse({"transcript": transcript})
+    # 5. Get WPM and filler word count from transcript
+    delivery_analysis = analyze_transcript(result)
+
+    return JSONResponse({"transcript": transcript, "transcript_analysis": delivery_analysis})

@@ -2,4 +2,5 @@ openai-whisper
 ffmpeg-python
 fastapi
 uvicorn[standard]
+ollama
 mediapipe
