@@ -14,17 +14,9 @@ function Analysis() {
       // Create a new rehearsal for the same speech
       const speechId = getCurrentSpeech();
       // TODO: create this endpoint
-      const response = await axios.post(
-        "http://localhost:8000/speech/rehearsal",
-        {
-          speechId,
-          rehearsal: {
-            analysis: [],
-            speech: speechId,
-            videoUrl: "",
-          },
-        },
-      );
+      const response = await axios.post("http://localhost:8000/rehearsal/", {
+        speech: speechId,
+      });
 
       // Update current rehearsal in localStorage
       addRehearsal(response.data.rehearsal.id);

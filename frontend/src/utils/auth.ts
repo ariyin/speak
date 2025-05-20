@@ -39,3 +39,7 @@ export const addRehearsal = (rehearsalId: string) => {
 export const getCurrentRehearsal = () => {
   return localStorage.getItem("currentRehearsal");
 };
+
+export const getCurrentSpeech = () => {
+  return localStorage.getItem("currentSpeech");
+};
