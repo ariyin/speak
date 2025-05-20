@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
 import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
 import { uploadFileToCloudinary } from "../utils/cloudinaryService";
@@ -17,7 +17,7 @@ function Video() {
   const [showRecorder, setShowRecorder] = useState(false);
   const [backRoute, setBackRoute] = useState<string | null>(null);
   const { rehearsalId } = useParams();
-
+  const navigate = useNavigate();
   useEffect(() => {
     // Fetch the rehearsal data to determine the back route
     const fetchRehearsalData = async () => {

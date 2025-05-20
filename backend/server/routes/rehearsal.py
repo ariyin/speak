@@ -6,6 +6,7 @@ from server.database import (
     add_rehearsal,
     retrieve_rehearsal,
     delete_rehearsal,
+    connect_speech_rehearsal,
 )
 
 from server.models.rehearsal import UpdateRehearsalSchema, ResponseModel, ErrorResponseModel, RehearsalSchema
@@ -34,7 +35,11 @@ async def update_rehearsal_content(id: str, req: UpdateRehearsalSchema = Body(..
 async def add_rehearsal_data(rehearsal: RehearsalSchema = Body(...)):
     rehearsal_data = jsonable_encoder(rehearsal)
     new_rehearsal = await add_rehearsal(rehearsal_data)
-    return ResponseModel(new_rehearsal, "Rehearsal added successfully.")
+    await connect_speech_rehearsal(new_rehearsal["speech"], new_rehearsal["id"])
+    data = {
+        "rehearsal": new_rehearsal
+    }
+    return ResponseModel(data, "Rehearsal added successfully.")
 
 @router.get("/{id}", response_description="Rehearsal fetched from the database")
 async def get_rehearsal_data(id: str):

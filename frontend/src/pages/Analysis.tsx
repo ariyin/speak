@@ -22,7 +22,7 @@ function Analysis() {
       const response = await axios.post("http://localhost:8000/rehearsal/", {
         speech: speechId,
       });
-
+      console.log(response.data);
       // Update current rehearsal in localStorage
       addRehearsal(response.data.rehearsal.id);
 
