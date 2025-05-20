@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
-import { uploadFileToCloudinary } from "../utils/cloudinaryService";
-import axios from "axios";
 import ExitButton from "../components/ExitButton";
+import { uploadFileToCloudinary } from "../utils/cloudinaryService";
 
 function Video() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -12,9 +12,9 @@ function Video() {
   const [showRecorder, setShowRecorder] = useState(false);
   const [backRoute, setBackRoute] = useState<string | null>(null);
   const { rehearsalId } = useParams();
-  const navigate = useNavigate();
+
   useEffect(() => {
-    // Fetch the rehearsal data to determine the back route
+    // fetch the rehearsal data to determine the back route
     const fetchRehearsalData = async () => {
       try {
         const response = await axios.get(
@@ -22,8 +22,8 @@ function Video() {
         );
         const analysis = response.data.analysis;
 
-        // If only delivery is selected, back goes to type page
-        // Otherwise (content-only or both), back goes to content page
+        // if only delivery is selected, back goes to type page
+        // otherwise (content-only or both), back goes to content page
         if (analysis.length === 1 && analysis[0] === "delivery") {
           setBackRoute(`/rehearsal/${rehearsalId}/type`);
         } else {
@@ -31,7 +31,7 @@ function Video() {
         }
       } catch (error) {
         console.error("Error fetching rehearsal data:", error);
-        // Default to type page if there's an error
+        // default to type page if there's an error
         setBackRoute(`/rehearsal/${rehearsalId}/type`);
       }
     };

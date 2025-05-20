@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import clsx from "clsx";
-import { getCurrentRehearsal } from "../utils/auth";
 import axios from "axios";
 import ExitButton from "../components/ExitButton";
+import { getCurrentRehearsal } from "../utils/auth";
+
 function Type() {
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const navigate = useNavigate();

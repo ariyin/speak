@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
 import type { Speech } from "../utils/speechService";
 
 function SpeechCard({ speech }: { speech: Speech }) {

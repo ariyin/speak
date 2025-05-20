@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import SpeechCard from "../components/SpeechCard";
 import { getUserId, addSpeech, addRehearsal } from "../utils/auth";
 import type { Speech } from "../utils/speechService";
-import SpeechCard from "../components/SpeechCard";
 
 function Home() {
   const navigate = useNavigate();
