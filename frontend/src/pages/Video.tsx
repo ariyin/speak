@@ -1,14 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
 import { uploadFileToCloudinary } from "../lib/cloudinaryService";
+import axios from "axios";
 
 function Video() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showRecorder, setShowRecorder] = useState(false);
+  const [backRoute, setBackRoute] = useState<string | null>(null);
   const { rehearsalId } = useParams();
+
+  useEffect(() => {
+    // Fetch the rehearsal data to determine the back route
+    const fetchRehearsalData = async () => {
+      try {
+        // TODO: implement this endpoint
+        const response = await axios.get(
+          `http://localhost:8000/rehearsal/${rehearsalId}`,
+        );
+        const analysis = response.data.analysis;
+
+        // If only delivery is selected, back goes to type page
+        // Otherwise (content-only or both), back goes to content page
+        if (analysis.length === 1 && analysis[0] === "delivery") {
+          setBackRoute(`/rehearsal/${rehearsalId}/type`);
+        } else {
+          setBackRoute(`/rehearsal/${rehearsalId}/content`);
+        }
+      } catch (error) {
+        console.error("Error fetching rehearsal data:", error);
+        // Default to type page if there's an error
+        setBackRoute(`/rehearsal/${rehearsalId}/type`);
+      }
+    };
+
+    fetchRehearsalData();
+  }, []);
 
   const handleNext = async () => {
     if (!videoFile) return;
@@ -63,10 +92,11 @@ function Video() {
         </div>
       </div>
       <div className="flex justify-between">
-        {/* TODO: make dynamic based on path */}
-        <NavLink to={`/rehearsal/${rehearsalId}/content`}>
-          <button>back</button>
-        </NavLink>
+        {backRoute && (
+          <NavLink to={backRoute}>
+            <button>back</button>
+          </NavLink>
+        )}
         {videoFile && !showRecorder && (
           <button onClick={clearUpload}>clear upload</button>
         )}
