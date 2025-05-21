@@ -94,25 +94,24 @@ function Home() {
     },
   ];
 
-  // useEffect(() => {
-  //   const fetchSpeeches = async () => {
-  //     try {
-  //       const userId = getUserId();
-  //       // TODO: implement this endpoint
-  //       const response = await axios.get(
-  //         `http://localhost:8000/speech/user/${userId}`,
-  //       );
-  //       setSpeeches(response.data.map((speech: any) => speech));
-  //     } catch (err) {
-  //       // setError("Failed to load speeches");
-  //       console.error("Error fetching speeches:", err);
-  //     } finally {
-  //       // setLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchSpeeches = async () => {
+      try {
+        const userId = getUserId();
+        const response = await axios.get(
+          `http://localhost:8000/speech/user/${userId}`,
+        );
+        setSpeeches(response.data.speeches.map((speech: Speech) => speech));
+      } catch (err) {
+        // setError("Failed to load speeches");
+        console.error("Error fetching speeches:", err);
+      } finally {
+        // setLoading(false);
+      }
+    };
 
-  //   fetchSpeeches();
-  // }, []);
+    fetchSpeeches();
+  }, []);
 
   const [speeches, setSpeeches] = useState<Speech[]>(mockSpeeches);
 

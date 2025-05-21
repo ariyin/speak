@@ -24,8 +24,8 @@ async def connect_speech_rehearsal(speech_id: str, rehearsal_id: str):
 def speech_helper(speech) -> dict:
     return {
         "id": str(speech["_id"]),
-        "userId": speech["userId"],
-        "rehearsals": speech["rehearsals"],
+        "userId": str(speech["userId"]),
+        "rehearsals": [str(rehearsal) for rehearsal in speech["rehearsals"]],
     }
 
 async def add_speech(speech_data: dict) -> dict:
