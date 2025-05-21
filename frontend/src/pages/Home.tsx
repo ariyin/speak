@@ -7,92 +7,7 @@ import type { Speech } from "../utils/speechService";
 
 function Home() {
   const navigate = useNavigate();
-  const mockSpeeches: Speech[] = [
-    {
-      id: "1",
-      rehearsals: [
-        {
-          id: "r1",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 180,
-        },
-        {
-          id: "r2",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 165,
-        },
-      ],
-    },
-    {
-      id: "2",
-      rehearsals: [
-        {
-          id: "r3",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 90,
-        },
-      ],
-    },
-    {
-      id: "3",
-      rehearsals: [
-        {
-          id: "r4",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 600,
-        },
-        {
-          id: "r5",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 585,
-        },
-        {
-          id: "r6",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 595,
-        },
-      ],
-    },
-    {
-      id: "4",
-      rehearsals: [
-        {
-          id: "r7",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 300,
-        },
-        {
-          id: "r8",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 285,
-        },
-      ],
-    },
-    {
-      id: "5",
-      rehearsals: [
-        {
-          id: "r9",
-          duration: 240,
-        },
-      ],
-    },
-    {
-      id: "6",
-      rehearsals: [
-        {
-          id: "r10",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 120,
-        },
-        {
-          id: "r11",
-          videoUrl: "https://res.cloudinary.com/demo/video/upload/sample.mp4",
-          duration: 115,
-        },
-      ],
-    },
-  ];
+  const [speeches, setSpeeches] = useState<Speech[]>([]);
 
   useEffect(() => {
     const fetchSpeeches = async () => {
@@ -112,8 +27,6 @@ function Home() {
 
     fetchSpeeches();
   }, []);
-
-  const [speeches, setSpeeches] = useState<Speech[]>(mockSpeeches);
 
   // TODO: implement later
   // const [loading, setLoading] = useState(true);

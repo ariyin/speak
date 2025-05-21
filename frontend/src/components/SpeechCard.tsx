@@ -11,14 +11,14 @@ function SpeechCard({ speech }: { speech: Speech }) {
   // if (error) return <div>{error}</div>;
   // if (!speech) return null;
 
-  // Calculate total practice time in minutes
+  // calculate total practice time in minutes
   const totalPracticeTime =
     speech.rehearsals.reduce(
       (total, rehearsal) => total + (rehearsal.duration || 0),
       0,
     ) / 60; // convert seconds to minutes
 
-  // Get the first rehearsal with a video URL for the thumbnail
+  // get the first rehearsal with a video URL for the thumbnail
   const thumbnailRehearsal = speech.rehearsals.find((r) => r.videoUrl);
 
   return (
@@ -37,9 +37,9 @@ function SpeechCard({ speech }: { speech: Speech }) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-gray-400">
+            <p className="flex h-full w-full items-center justify-center text-gray-400">
               no video available
-            </div>
+            </p>
           )}
         </div>
         <div className="flex flex-col justify-between">
