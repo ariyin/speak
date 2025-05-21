@@ -51,7 +51,7 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
     return () => {
       // cleanup: stop all tracks (camera/mic) when the component unmounts or closes
       if (stream) {
-        stream.getTracks().forEach((track) => track.stop()); // Stops the camera/mic
+        stream.getTracks().forEach((track) => track.stop()); // stops the camera/mic
       }
     };
   }, []);

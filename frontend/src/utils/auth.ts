@@ -13,11 +13,6 @@ export const getUserId = (): string => {
   return userId;
 };
 
-// clear user ID
-export const clearUserId = () => {
-  localStorage.removeItem("userId");
-};
-
 export const addSpeech = (speechId: string) => {
   let speeches = JSON.parse(localStorage.getItem("speeches") || "[]");
   if (!speeches) {
@@ -28,10 +23,28 @@ export const addSpeech = (speechId: string) => {
   localStorage.setItem("currentSpeech", speechId);
 };
 
+export const getCurrentSpeech = () => {
+  return localStorage.getItem("currentSpeech");
+};
+
 export const addRehearsal = (rehearsalId: string) => {
   localStorage.setItem("currentRehearsal", rehearsalId);
 };
 
 export const getCurrentRehearsal = () => {
   return localStorage.getItem("currentRehearsal");
+};
+
+export const deleteCurrentRehearsal = () => {
+  localStorage.removeItem("currentRehearsal");
+};
+
+export const deleteSpeech = (speechId: string) => {
+  let speeches = JSON.parse(localStorage.getItem("speeches") || "[]");
+  if (!speeches) {
+    speeches = [];
+  }
+  speeches = speeches.filter((id: string) => id !== speechId);
+  localStorage.setItem("speeches", JSON.stringify(speeches));
+  localStorage.removeItem("currentSpeech");
 };

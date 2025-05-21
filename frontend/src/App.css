@@ -31,6 +31,10 @@
     @apply font-manrope text-2xl font-bold;
   }
 
+  h3 {
+    @apply font-manrope text-xl font-bold;
+  }
+
   p {
     @apply font-gs;
   }
@@ -46,7 +50,7 @@
 
 /* ONLY TOP BUTTONS */
 .layout-t {
-  @apply grid h-screen w-screen grid-rows-[auto_1fr] items-center gap-y-8 p-8;
+  @apply grid h-fit min-h-screen w-screen grid-rows-[auto_1fr] items-center gap-y-8 p-8;
 }
 
 /* W TOP AND BOTTOM BUTTONS */

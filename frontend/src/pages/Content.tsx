@@ -1,7 +1,7 @@
-import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { getCurrentRehearsal } from "../utils/auth";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import ExitButton from "../components/ExitButton";
 
 function Content() {
   const [content, setContent] = useState("");
@@ -9,11 +9,11 @@ function Content() {
     null,
   );
   const navigate = useNavigate();
+  const { rehearsalId } = useParams();
 
   const handleNext = async () => {
     if (!content || !contentType) return;
 
-    const rehearsalId = getCurrentRehearsal();
     try {
       const response = await axios.patch(
         `http://localhost:8000/rehearsal/content/${rehearsalId}`,
@@ -26,7 +26,7 @@ function Content() {
       );
 
       if (response.status === 200) {
-        navigate("/video");
+        navigate(`/rehearsal/${rehearsalId}/video`);
       }
     } catch (error) {
       console.error("Failed to update content:", error);
@@ -35,9 +35,7 @@ function Content() {
 
   return (
     <div className="layout-tb">
-      <NavLink to="/" className="justify-self-end">
-        <button>exit</button>
-      </NavLink>
+      <ExitButton />
       <div className="flex h-full w-full max-w-4/5 flex-col gap-8 justify-self-center">
         <div className="flex flex-col items-center gap-5 text-center">
           <h1>what are you uploading?</h1>
@@ -64,7 +62,7 @@ function Content() {
         />
       </div>
       <div className="flex justify-between">
-        <NavLink to="/type">
+        <NavLink to={`/rehearsal/${rehearsalId}/type`}>
           <button>back</button>
         </NavLink>
         <button onClick={handleNext} disabled={!content || !contentType}>

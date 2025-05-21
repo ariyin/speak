@@ -1,13 +1,43 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import UploadModal from "../components/UploadModal";
 import RecordingModal from "../components/RecordingModal";
-import { uploadFileToCloudinary } from "../lib/cloudinaryService";
+import ExitButton from "../components/ExitButton";
+import { uploadFileToCloudinary } from "../utils/cloudinaryService";
 
 function Video() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showRecorder, setShowRecorder] = useState(false);
+  const [backRoute, setBackRoute] = useState<string | null>(null);
+  const { rehearsalId } = useParams();
+
+  useEffect(() => {
+    // fetch the rehearsal data to determine the back route
+    const fetchRehearsalData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/rehearsal/${rehearsalId}`,
+        );
+        const analysis = response.data.analysis;
+
+        // if only delivery is selected, back goes to type page
+        // otherwise (content-only or both), back goes to content page
+        if (analysis.length === 1 && analysis[0] === "delivery") {
+          setBackRoute(`/rehearsal/${rehearsalId}/type`);
+        } else {
+          setBackRoute(`/rehearsal/${rehearsalId}/content`);
+        }
+      } catch (error) {
+        console.error("Error fetching rehearsal data:", error);
+        // default to type page if there's an error
+        setBackRoute(`/rehearsal/${rehearsalId}/type`);
+      }
+    };
+
+    fetchRehearsalData();
+  }, []);
 
   const handleNext = async () => {
     if (!videoFile) return;
@@ -25,9 +55,7 @@ function Video() {
 
   return (
     <div className="layout-tb">
-      <NavLink to="/" className="justify-self-end">
-        <button>exit</button>
-      </NavLink>
+      <ExitButton />
       <div className="grid h-full grid-rows-[auto_1fr] justify-center gap-8">
         <div className="flex flex-col items-center gap-5 text-center">
           <h1>how do you want to upload your video?</h1>
@@ -62,14 +90,15 @@ function Video() {
         </div>
       </div>
       <div className="flex justify-between">
-        {/* TODO: make dynamic based on path */}
-        <NavLink to="/content">
-          <button>back</button>
-        </NavLink>
+        {backRoute && (
+          <NavLink to={backRoute}>
+            <button>back</button>
+          </NavLink>
+        )}
         {videoFile && !showRecorder && (
           <button onClick={clearUpload}>clear upload</button>
         )}
-        <NavLink to="/analysis">
+        <NavLink to={`/rehearsal/${rehearsalId}/analysis`}>
           <button onClick={handleNext} disabled={!videoFile}>
             next
           </button>
