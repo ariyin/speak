@@ -3,4 +3,4 @@ ffmpeg-python
 fastapi
 uvicorn[standard]
 ollama
-mediapipe
+google-genai
