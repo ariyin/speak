@@ -164,6 +164,9 @@ json_config = GenerateContentConfig(
 )
 
 ## INITIAL BODY LANGUAGE ANALYSIS API
+class VideoURLRequest(BaseModel):
+    url: HttpUrl
+
 @app.post("/analyze_body_language/")
 # change so that this takes in a cloundinary URL, converts to a file, and then uploads to Gemini
 #https://res.cloudinary.com/drg6bi879/video/upload/v1747867042/videoplayback_vrwez9.mp4
@@ -255,6 +258,7 @@ async def analyze_body_language_improvement(req: VideoURLRequest, feedback: str)
         raise HTTPException(500, f"Could not parse outer JSON: {e}")
     
     return wrapper
+
     
 
     
