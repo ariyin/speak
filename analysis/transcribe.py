@@ -181,7 +181,7 @@ async def analyze_video(file: UploadFile = File(...)):
             model=GEMINI_PRO_MODEL_ID,
             contents=[
                 video_analysis_prompt,
-                Part.from_bytes(data=video_bytes, mime_type="video/x-matroska"),
+                Part.from_bytes(data=video_bytes, mime_type= mime_type),
             ],
             config=json_config,
         )
