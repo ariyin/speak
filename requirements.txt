@@ -5,6 +5,10 @@ uvicorn[standard]
 ollama
 google-genai
 <<<<<<< HEAD
+<<<<<<< HEAD
 openai
 =======
 >>>>>>> e3257e9 (body language API)
+=======
+openai
+>>>>>>> c8d3590 (updated transcript to come from cloudinary URL + cleaned up files)

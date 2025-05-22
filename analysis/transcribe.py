@@ -25,9 +25,16 @@ import uvicorn
 import json
 import mimetypes
 from openai import OpenAI
+from openai import OpenAI
 
 app = FastAPI()
 model = whisper.load_model("small")   # or "base", "medium", "large"
+
+from prompts import (
+    video_analysis_prompt,
+    video_improvement_prompt,
+    content_analysis_prompt,
+)
 
 from prompts import (
     video_analysis_prompt,
@@ -46,6 +53,11 @@ GEMINI_PRO_MODEL_ID = "gemini-2.0-flash"
 # load credentials from env file
 load_dotenv()
 
+# checks if URL is valid
+class VideoURLRequest(BaseModel):
+    url: HttpUrl
+
+## FILLER WORD + SPEED ANALYSIS
 # checks if URL is valid
 class VideoURLRequest(BaseModel):
     url: HttpUrl
@@ -164,9 +176,6 @@ json_config = GenerateContentConfig(
 )
 
 ## INITIAL BODY LANGUAGE ANALYSIS API
-class VideoURLRequest(BaseModel):
-    url: HttpUrl
-
 @app.post("/analyze_body_language/")
 # change so that this takes in a cloundinary URL, converts to a file, and then uploads to Gemini
 #https://res.cloudinary.com/drg6bi879/video/upload/v1747867042/videoplayback_vrwez9.mp4
