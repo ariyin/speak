@@ -9,11 +9,12 @@ from dotenv import load_dotenv
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 from typing import List, Dict
 
 import ffmpeg                  # ffmpeg-python wrapper
 import whisper                 # OpenAI Whisper local
+import httpx                   # for converting cloudinary URL; gemini does not take in URL directly
 
 from google import genai
 from google.genai.types import Part, GenerateContentConfig
@@ -95,16 +96,12 @@ video_analysis_response_schema = {
                             "type": "STRING",
                             "description": "HH:MM:SS for display"
                         },
-                        "time_seconds": {
-                            "type": "NUMBER",
-                            "description": "Offset in seconds from start of video"
-                        },
                         "description": {
                             "type": "STRING",
                             "description": "What nonverbal behavior is observed"
                         }
                     },
-                    "required": ["timestamp", "time_seconds", "description"]
+                    "required": ["timestamp", "description"]
                 }
             },
             "cons": {
@@ -116,16 +113,12 @@ video_analysis_response_schema = {
                             "type": "STRING",
                             "description": "HH:MM:SS for display"
                         },
-                        "time_seconds": {
-                            "type": "NUMBER",
-                            "description": "Offset in seconds from start of video"
-                        },
                         "description": {
                             "type": "STRING",
                             "description": "What nonverbal behavior is observed"
                         }
                     },
-                    "required": ["timestamp", "time_seconds", "description"]
+                    "required": ["timestamp", "description"]
                 }
             }
         },
@@ -157,19 +150,26 @@ json_config = GenerateContentConfig(
     response_schema=video_analysis_response_schema,
 )
 
-@app.post("/analyze_body_language/")
-async def analyze_video(file: UploadFile = File(...)):
-    # 1) Validate it’s a video of any format
-    if not file.content_type.startswith("video/"):
-        raise HTTPException(status_code=400, detail="Invalid file type; only video/* is supported.")
+class VideoURLRequest(BaseModel):
+    url: HttpUrl
 
-    # 2) Read bytes
-    video_bytes = await file.read()
+@app.post("/analyze_body_language/")
+# change so that this takes in a cloundinary URL, converts to a file, and then uploads to Gemini
+#https://res.cloudinary.com/drg6bi879/video/upload/v1747867042/videoplayback_vrwez9.mp4
+# ex. would take in a link like this
+async def analyze_video(req: VideoURLRequest):
+    # Fetch the video bytes from the Cloudinary URL
+    url = str(req.url)
+    async with httpx.AsyncClient() as http_client:
+        resp = await http_client.get(url)
+    if resp.status_code != 200:
+        raise HTTPException(400, f"Failed to fetch video from URL: {resp.status_code}")
+    video_bytes = resp.content
 
     # 3) Pick a mime type (prefer the reported one, else guess from extension)
-    mime_type = file.content_type
+    mime_type = resp.headers.get("content-type")
     if not mime_type:
-        mime_type, _ = mimetypes.guess_type(file.filename)
+        mime_type, _ = mimetypes.guess_type(url)
         if not mime_type or not mime_type.startswith("video/"):
             mime_type = "application/octet-stream"
 
@@ -188,20 +188,8 @@ async def analyze_video(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-    # try:
-    #     wrapper = response.json()
-    #     text_str = wrapper.get("candidates", [])[0]["content"]["parts"][0]["text"]
-    #     analysis = json.loads(text_str)
-    # except Exception:
-    #     # Fallback: if already structured
-    #     analysis = wrapper
-
-    # # Return JSON for front-end
-    # return analysis
-
     # 5) Unwrap the parsed result
     raw_wrapper = response.text
-    #print(raw_wrapper)
 
     try:
         wrapper = json.loads(raw_wrapper)
@@ -209,6 +197,7 @@ async def analyze_video(file: UploadFile = File(...)):
         raise HTTPException(500, f"Could not parse outer JSON: {e}")
     
     return wrapper
+
     
 
     
