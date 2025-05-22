@@ -58,9 +58,7 @@ class VideoURLRequest(BaseModel):
     url: HttpUrl
 
 ## FILLER WORD + SPEED ANALYSIS
-# checks if URL is valid
-class VideoURLRequest(BaseModel):
-    url: HttpUrl
+# checks if URL is vali
 
 ## FILLER WORD + SPEED ANALYSIS
 @app.post("/analyze_transcript/")
