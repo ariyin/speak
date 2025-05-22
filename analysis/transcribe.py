@@ -50,7 +50,7 @@ class VideoURLRequest(BaseModel):
 ## FILLER WORD + SPEED ANALYSIS
 @app.post("/analyze_transcript/")
 # takes in cloudinary URL, and gets transcript along with analysis
-async def analyze_transcript(req: VideoURLRequest):
+async def upload_video(req: VideoURLRequest):
     # 1) Download video
     async with httpx.AsyncClient() as client:
         resp = await client.get(str(req.url))
@@ -100,27 +100,7 @@ async def analyze_content_outline(outline: str, transcript: str):
     """
     prompt = content_analysis_prompt.format(outline=outline, transcript=transcript)
 
-    # # Call Gemini PRO
-    # client = get_gemini_client()
-    # try:
-    #     response = client.models.generate_content(
-    #         model=GEMINI_PRO_MODEL_ID,
-    #         contents=[prompt],
-    #         config=json_config,
-    #     )
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail=str(e))
-    
-    # # 5) Unwrap the parsed result
-    # raw_wrapper = response.text
-
-    # try:
-    #     wrapper = json.loads(raw_wrapper)
-    # except json.JSONDecodeError as e:
-    #     raise HTTPException(500, f"Could not parse outer JSON: {e}")
-    
-    # return wrapper
-
+    ## Feed into Lllama 3 here
 
 ## BODY LANGUAGE ANALYSIS APIS
 
