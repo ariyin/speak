@@ -4,4 +4,7 @@ fastapi
 uvicorn[standard]
 ollama
 google-genai
+<<<<<<< HEAD
 openai
+=======
+>>>>>>> e3257e9 (body language API)

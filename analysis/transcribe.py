@@ -7,7 +7,10 @@ from transcript_analysis import analyze_transcript
 import os
 from dotenv import load_dotenv
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
+import os
+from dotenv import load_dotenv
+
+from fastapi import FastAPI, File, UploadFile, HTTPException, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, HttpUrl
 from typing import List, Dict
