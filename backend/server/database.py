@@ -70,6 +70,8 @@ def rehearsal_helper(rehearsal) -> dict:
         "analysis": rehearsal["analysis"],
         "speech": str(rehearsal["speech"]),
         "videoUrl": rehearsal["videoUrl"],
+        "deliveryAnalysis": rehearsal.get("deliveryAnalysis"),
+        "contentAnalysis": rehearsal.get("contentAnalysis"),
     }
 
 async def add_rehearsal(rehearsal_data: dict) -> dict:

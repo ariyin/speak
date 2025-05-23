@@ -53,7 +53,7 @@ function Video() {
     }
 
     // navigate or pass along publicId
-    navigate(`/rehearsal/${rehearsalId}/analysis`, { state: { publicId }});
+    navigate(`/rehearsal/${rehearsalId}/analysis`, { state: { publicId, secureUrl }});
   };
 
   function clearUpload() {

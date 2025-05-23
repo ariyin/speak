@@ -39,19 +39,19 @@ def detect_filler_words_with_gpt(result: dict) -> list:
     detected_fillers = []
 
     for i, chunk in enumerate(sentence_chunks):
-        print(f"RUN {i + 1}: ================")
+        #print(f"RUN {i + 1}: ================")
         chunk = sentence_chunks[i]
-        print("INPUT: " + chunk)
+        #print("INPUT: " + chunk)
         prompt = FILLER_PROMPT_TEMPLATE.format(text=chunk)
 
         # Send the chunk to Mistral for filler word detection
         response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
 
-        print("RAW: " + response.message.content)
+        #print("RAW: " + response.message.content)
 
         filler_word_dict = extract_first_bracketed_content(response.message.content)
 
-        print("FILTERED: " + filler_word_dict)
+        #print("FILTERED: " + filler_word_dict)
 
         try:
             chunk_result = json.loads(filler_word_dict)
@@ -63,8 +63,6 @@ def detect_filler_words_with_gpt(result: dict) -> list:
         # Map the detected filler words to the corresponding timestamps in the transcript
         for entry in chunk_result:
             detected_fillers.extend(entry["filler_phrases"])
-
-        time.sleep(0.3)
     
     return detected_fillers
 

@@ -11,6 +11,7 @@ import os
 from dotenv import load_dotenv
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, HttpUrl
 from typing import List, Dict
@@ -28,6 +29,14 @@ from openai import OpenAI
 from openai import OpenAI
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 model = whisper.load_model("small")   # or "base", "medium", "large"
 
 from prompts import (
@@ -101,7 +110,7 @@ async def upload_video(req: VideoURLRequest):
     # 5. Get WPM and filler word count from transcript
     delivery_analysis = analyze_transcript(result)
 
-    return JSONResponse({"transcript": transcript, "transcript_analysis": delivery_analysis})
+    return JSONResponse({"transcript": transcript, "analysis": delivery_analysis})
 
 
 # Content Analysis: Outline
