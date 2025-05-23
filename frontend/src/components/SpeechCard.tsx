@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { Speech } from "../utils/speechService";
 import axios from "axios";
 import type { Rehearsal } from "../utils/rehearsalService";
+import { addSpeech } from "../utils/auth";
 
 function SpeechCard({ speech }: { speech: Speech }) {
   // TODO: implement later
@@ -12,7 +13,8 @@ function SpeechCard({ speech }: { speech: Speech }) {
   // if (loading) return <div>Loading...</div>;
   // if (error) return <div>{error}</div>;
   // if (!speech) return null;
-  const [rehearsals, setRehearsals] = useState<(Rehearsal|null)[]>([null]);
+  const navigate = useNavigate();
+  const [rehearsals, setRehearsals] = useState<(Rehearsal | null)[]>([null]);
 
   useEffect(() => {
     const fetchRehearsals = async () => {
@@ -20,7 +22,9 @@ function SpeechCard({ speech }: { speech: Speech }) {
 
       for (const r of speech.rehearsals) {
         try {
-          const response = await axios.get(`http://localhost:8000/rehearsal/${r}`);
+          const response = await axios.get(
+            `http://localhost:8000/rehearsal/${r}`,
+          );
           fetched.push(response.data);
         } catch (err) {
           console.warn("Failed to fetch rehearsal:", err);
@@ -34,7 +38,6 @@ function SpeechCard({ speech }: { speech: Speech }) {
     fetchRehearsals();
   }, [speech.rehearsals]);
 
-
   // calculate total practice time in minutes
   const totalPracticeTime =
     rehearsals.reduce(
@@ -45,11 +48,15 @@ function SpeechCard({ speech }: { speech: Speech }) {
   // get the first rehearsal with a video URL for the thumbnail
   const thumbnailRehearsal = rehearsals.find((r) => r?.videoUrl);
 
+  const handleClick = () => {
+    addSpeech(speech.id);
+    navigate(`/speech/${speech.id}/summary`);
+  };
+
   return (
-    // TODO: decide where to route this
-    <NavLink
-      to={`/speech/${speech.id}/summary`}
-      className="hover:text-cherry rounded-lg transition-colors"
+    <div
+      onClick={handleClick}
+      className="hover:text-cherry cursor-pointer rounded-lg transition-colors"
     >
       <div className="flex flex-col gap-4">
         <div className="aspect-video rounded bg-gray-200">
@@ -68,7 +75,7 @@ function SpeechCard({ speech }: { speech: Speech }) {
         </div>
         <div className="flex flex-col justify-between">
           <div>
-            <h3>{`Speech ${speech.id}`}</h3>
+            <h3>speech {speech.id}</h3>
             <p className="text-sm text-gray-600">
               {speech.rehearsals.length} rehearsal
               {speech.rehearsals.length !== 1 ? "s" : ""}
@@ -79,7 +86,7 @@ function SpeechCard({ speech }: { speech: Speech }) {
           </p>
         </div>
       </div>
-    </NavLink>
+    </div>
   );
 }
 

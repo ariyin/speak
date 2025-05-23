@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import Home from "./pages/Home";
 import Type from "./pages/Type";
@@ -11,14 +12,24 @@ import Content from "./pages/Content";
 import Video from "./pages/Video";
 import Analysis from "./pages/Analysis";
 import Summary from "./pages/Summary";
-import { getCurrentRehearsal } from "./utils/auth";
+import { getCurrentRehearsal, getCurrentSpeech } from "./utils/auth";
 
-// Route protection component
+// route protection component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
   const rehearsalId = getCurrentRehearsal();
-  if (!rehearsalId) {
+  const speechId = getCurrentSpeech();
+
+  // for rehearsal routes, we need a current rehearsal
+  if (location.pathname.includes("/rehearsal/") && !rehearsalId) {
     return <Navigate to="/" replace />;
   }
+
+  // for speech routes, we need a current speech
+  if (location.pathname.includes("/speech/") && !speechId) {
+    return <Navigate to="/" replace />;
+  }
+
   return <>{children}</>;
 }
 
