@@ -1,5 +1,5 @@
 import { useRef, useCallback } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import VideoPlayer from "../components/VideoPlayer";
 import ExitButton from "../components/ExitButton";
@@ -8,7 +8,9 @@ import { addRehearsal, getCurrentSpeech } from "../utils/auth";
 
 function Analysis() {
   const playerRef = useRef<CloudinaryPlayer | null>(null);
+  const { state } = useLocation();
   const navigate = useNavigate();
+  const publicId = state?.publicId;
 
   const handleRehearseAgain = async () => {
     try {
@@ -46,7 +48,7 @@ function Analysis() {
       <div className="grid h-full grid-cols-2 gap-4">
         <div>
           <button onClick={jumpToMiddle}>Jump to Middle</button>
-          <VideoPlayer onReady={handleReady} />
+          <VideoPlayer publicId={publicId} onReady={handleReady} />
         </div>
         <div className="rounded-2xl border-2 border-black p-4">
           analysis goes here

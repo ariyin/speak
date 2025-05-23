@@ -92,12 +92,11 @@ async def retrieve_rehearsal(rehearsal_id: str) -> dict:
 async def update_rehearsal(rehearsal_id: str, data: dict) -> bool:
     if len(data) < 1:
         return False
-    rehearsal = rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})    
+    rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})    
     if rehearsal:
-        updated_rehearsal = rehearsal_collection.update_one({"_id": ObjectId(rehearsal_id)}, {"$set": data})
-        if updated_rehearsal:
-            return True
-        return False
+        updated_rehearsal = await rehearsal_collection.update_one({"_id": ObjectId(rehearsal_id)}, {"$set": data})
+        return updated_rehearsal.matched_count > 0
+    return False
     
 async def delete_rehearsal(rehearsal_id: str) -> bool:
     rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})

@@ -13,6 +13,8 @@ function Video() {
   const [backRoute, setBackRoute] = useState<string | null>(null);
   const { rehearsalId } = useParams();
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     // fetch the rehearsal data to determine the back route
     const fetchRehearsalData = async () => {
@@ -41,8 +43,17 @@ function Video() {
 
   const handleNext = async () => {
     if (!videoFile) return;
-    const uploadedUrl = await uploadFileToCloudinary(videoFile);
-    // navigate or pass along uploadedUrl
+    const { secureUrl, publicId } = await uploadFileToCloudinary(videoFile);
+
+    // Update rehearsal with link for preview
+    try {
+      await axios.patch(`http://localhost:8000/rehearsal/video_url/${rehearsalId}/`, { videoUrl: secureUrl, } );
+    } catch (error) {
+      console.error("Error updating rehearsal video url:", error);
+    }
+
+    // navigate or pass along publicId
+    navigate(`/rehearsal/${rehearsalId}/analysis`, { state: { publicId }});
   };
 
   function clearUpload() {
@@ -98,11 +109,10 @@ function Video() {
         {videoFile && !showRecorder && (
           <button onClick={clearUpload}>clear upload</button>
         )}
-        <NavLink to={`/rehearsal/${rehearsalId}/analysis`}>
-          <button onClick={handleNext} disabled={!videoFile}>
-            next
-          </button>
-        </NavLink>
+
+        <button onClick={handleNext} disabled={!videoFile}>
+          next
+        </button>
       </div>
     </div>
   );

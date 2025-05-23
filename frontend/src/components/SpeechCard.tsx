@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import type { Speech } from "../utils/speechService";
+import axios from "axios";
+import type { Rehearsal } from "../utils/rehearsalService";
 
 function SpeechCard({ speech }: { speech: Speech }) {
   // TODO: implement later
@@ -10,16 +12,38 @@ function SpeechCard({ speech }: { speech: Speech }) {
   // if (loading) return <div>Loading...</div>;
   // if (error) return <div>{error}</div>;
   // if (!speech) return null;
+  const [rehearsals, setRehearsals] = useState<(Rehearsal|null)[]>([null]);
+
+  useEffect(() => {
+    const fetchRehearsals = async () => {
+      const fetched: (Rehearsal | null)[] = [];
+
+      for (const r of speech.rehearsals) {
+        try {
+          const response = await axios.get(`http://localhost:8000/rehearsal/${r}`);
+          fetched.push(response.data);
+        } catch (err) {
+          console.warn("Failed to fetch rehearsal:", err);
+          fetched.push(null); // Explicitly push null if fetch fails
+        }
+      }
+
+      setRehearsals(fetched);
+    };
+
+    fetchRehearsals();
+  }, [speech.rehearsals]);
+
 
   // calculate total practice time in minutes
   const totalPracticeTime =
-    speech.rehearsals.reduce(
-      (total, rehearsal) => total + (rehearsal.duration || 0),
+    rehearsals.reduce(
+      (total, rehearsal) => total + (rehearsal?.duration || 0),
       0,
     ) / 60; // convert seconds to minutes
 
   // get the first rehearsal with a video URL for the thumbnail
-  const thumbnailRehearsal = speech.rehearsals.find((r) => r.videoUrl);
+  const thumbnailRehearsal = rehearsals.find((r) => r?.videoUrl);
 
   return (
     // TODO: decide where to route this
@@ -32,7 +56,7 @@ function SpeechCard({ speech }: { speech: Speech }) {
           {/* TODO: check file format works */}
           {thumbnailRehearsal ? (
             <img
-              src={thumbnailRehearsal.videoUrl!.replace(".mkv", ".jpg")}
+              src={thumbnailRehearsal.videoUrl!.replace(".mp4", ".jpg")}
               alt="Speech thumbnail"
               className="h-full w-full object-cover"
             />

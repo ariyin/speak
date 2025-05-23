@@ -31,6 +31,16 @@ async def update_rehearsal_content(id: str, req: UpdateRehearsalSchema = Body(..
         return ResponseModel(res, "Rehearsal updated successfully.")
     return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
 
+@router.patch("/video_url/{id}", response_description="Rehearsal video URL updated")
+async def update_rehearsal_video_url(id: str, req: UpdateRehearsalSchema = Body(...)):
+    video_url = { "videoUrl": req.videoUrl}
+    print(video_url)
+    updated_rehearsal = await update_rehearsal(id, video_url)
+    if updated_rehearsal:
+        res = { "response": "Rehearsal {} updated succesfully".format(id)}
+        return ResponseModel(res, "Rehearsal updated successfully.")
+    return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
+
 @router.post("/", response_description="Rehearsal added into the database")
 async def add_rehearsal_data(rehearsal: RehearsalSchema = Body(...)):
     rehearsal_data = jsonable_encoder(rehearsal)
@@ -44,7 +54,9 @@ async def add_rehearsal_data(rehearsal: RehearsalSchema = Body(...)):
 @router.get("/{id}", response_description="Rehearsal fetched from the database")
 async def get_rehearsal_data(id: str):
     rehearsal = await retrieve_rehearsal(id)
-    return ResponseModel(rehearsal, "Rehearsal fetched successfully.")
+    if rehearsal:
+        return ResponseModel(rehearsal, "Rehearsal fetched successfully.")
+    return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
 
 @router.delete("/{id}", response_description="Rehearsal deleted from the database")
 async def delete_rehearsal_data(id: str):

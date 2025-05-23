@@ -17,6 +17,7 @@ function Home() {
           `http://localhost:8000/speech/user/${userId}`,
         );
         setSpeeches(response.data.speeches.map((speech: Speech) => speech));
+        console.log(response.data.speeches);
       } catch (err) {
         // setError("Failed to load speeches");
         console.error("Error fetching speeches:", err);

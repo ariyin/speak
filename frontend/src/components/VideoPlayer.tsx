@@ -4,10 +4,11 @@ import cloudinary from "cloudinary-video-player";
 import "cloudinary-video-player/cld-video-player.min.css";
 
 interface VideoPlayerProps {
+  publicId: string;
   onReady?: (player: CloudinaryPlayer) => void;
 }
 
-const VideoPlayer = ({ onReady }: VideoPlayerProps) => {
+const VideoPlayer = ({ publicId, onReady }: VideoPlayerProps) => {
   const playerRef = useRef<CloudinaryPlayer | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -28,7 +29,7 @@ const VideoPlayer = ({ onReady }: VideoPlayerProps) => {
         secure: true,
       });
 
-      player.source("youtube_NwpJKXXgqxg_1280x720_h264_pbl058");
+      player.source(publicId);
       playerRef.current = player;
       onReady?.(player); // <-- callback used here
     });
