@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -10,26 +9,6 @@ import {
 
 function ExitButton() {
   const navigate = useNavigate();
-  const [isFirstRehearsal, setIsFirstRehearsal] = useState(false);
-
-  useEffect(() => {
-    const checkRehearsalCount = async () => {
-      try {
-        const speechId = getCurrentSpeech();
-        if (!speechId) return;
-
-        const response = await axios.get(
-          `http://localhost:8000/speech/${speechId}`,
-        );
-        const rehearsals = response.data.rehearsals;
-        setIsFirstRehearsal(rehearsals.length === 1);
-      } catch (error) {
-        console.error("Error checking rehearsal count:", error);
-      }
-    };
-
-    checkRehearsalCount();
-  }, []);
 
   const handleExit = async () => {
     try {
@@ -39,6 +18,14 @@ function ExitButton() {
       if (!rehearsalId || !speechId) {
         throw new Error("No rehearsal or speech ID found");
       }
+
+      // check if this is the first rehearsal
+      const speechResponse = await axios.get(
+        `http://localhost:8000/speech/${speechId}`,
+      );
+
+      const rehearsals = speechResponse.data.rehearsals;
+      const isFirstRehearsal = rehearsals.length === 1;
 
       // always delete the current rehearsal
       const rehearsalDeleted = await axios.delete(

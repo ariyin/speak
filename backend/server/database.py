@@ -40,7 +40,7 @@ async def retrieve_speeches(user_id: str) -> list:
     return speeches
 
 async def retrieve_speech(speech_id: str) -> dict:
-    speech = speech_collection.find_one({"_id": ObjectId(speech_id)})
+    speech = await speech_collection.find_one({"_id": ObjectId(speech_id)})
     if speech:
         return speech_helper(speech)
     return None

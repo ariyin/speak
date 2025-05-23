@@ -7,12 +7,20 @@ from server.database import (
     connect_speech_rehearsal,
     delete_speech,
     retrieve_speeches,
+    retrieve_speech,
 )
 from server.models.speech import (SpeechSchema,     ErrorResponseModel,
     ResponseModel,)
 from server.models.rehearsal import RehearsalSchema
 
 router = APIRouter()
+
+@router.get("/{id}", response_description="Speech retrieved from the database")
+async def get_speech_data(id: str):
+    speech = await retrieve_speech(id)
+    if speech:
+        return ResponseModel(speech, "Speech successfully retrieved.")
+    return ErrorResponseModel("An error occurred.", 404, "Speech not found")
 
 @router.post("/", response_description="Speech added into the database")
 async def add_speech_data(speech: SpeechSchema = Body(...), rehearsal: RehearsalSchema = Body(...)):
