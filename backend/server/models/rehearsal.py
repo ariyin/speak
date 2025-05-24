@@ -11,6 +11,8 @@ class RehearsalSchema(BaseModel):
     speech: PyObjectId
     videoUrl: Optional[str] = None
     content: Optional[Dict[str, str]] = None
+    contentAnalysis: Optional[Dict] = None
+    deliveryAnalysis: Optional[Dict] = None
 
     class Config:
         populate_by_name = True
@@ -21,6 +23,8 @@ class UpdateRehearsalSchema(BaseModel):
     analysis: Optional[List[str]] = None
     videoUrl: Optional[str] = None
     content: Optional[Dict[str, str]] = None
+    contentAnalysis: Optional[Dict] = None
+    deliveryAnalysis: Optional[Dict] = None
 
     class Config:
         arbitrary_types_allowed = True

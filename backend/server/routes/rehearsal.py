@@ -34,8 +34,25 @@ async def update_rehearsal_content(id: str, req: UpdateRehearsalSchema = Body(..
 @router.patch("/video_url/{id}", response_description="Rehearsal video URL updated")
 async def update_rehearsal_video_url(id: str, req: UpdateRehearsalSchema = Body(...)):
     video_url = { "videoUrl": req.videoUrl}
-    print(video_url)
     updated_rehearsal = await update_rehearsal(id, video_url)
+    if updated_rehearsal:
+        res = { "response": "Rehearsal {} updated succesfully".format(id)}
+        return ResponseModel(res, "Rehearsal updated successfully.")
+    return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
+
+@router.patch("/delivery_analysis/{id}", response_description="Rehearsal delivery analysis updated")
+async def update_rehearsal_delivery_analysis(id: str, req: UpdateRehearsalSchema = Body(...)):
+    delivery_analysis = { "deliveryAnalysis": req.deliveryAnalysis}
+    updated_rehearsal = await update_rehearsal(id, delivery_analysis)
+    if updated_rehearsal:
+        res = { "response": "Rehearsal {} updated succesfully".format(id)}
+        return ResponseModel(res, "Rehearsal updated successfully.")
+    return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
+
+@router.patch("/content_analysis/{id}", response_description="Rehearsal content analysis updated")
+async def update_rehearsal_content_analysis(id: str, req: UpdateRehearsalSchema = Body(...)):
+    content_analysis = { "contentAnalysis": req.contentAnalysis}
+    updated_rehearsal = await update_rehearsal(id, content_analysis)
     if updated_rehearsal:
         res = { "response": "Rehearsal {} updated succesfully".format(id)}
         return ResponseModel(res, "Rehearsal updated successfully.")
