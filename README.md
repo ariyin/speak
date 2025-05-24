@@ -1,4 +1,4 @@
-# public speaking
+![speak logo](frontend/public/speak-full.svg)
 
 designed to ease public speaking anxiety and boost your confidence. get targeted feedback on how closely your speech matches your prepared outline or script, along with insights on filler words, pacing, and body language.
 
@@ -40,7 +40,17 @@ MONGODB_URL=mongodb+srv://<db_username>:<db_password>@cluster0.wddsg5v.mongodb.n
 PORT=8000
 ```
 
+### analysis
+
+create a `.env` file in `/analysis` with the following:
+
+```env
+GEMINI_API_KEY=
+```
+
 ## usage
+
+### overall flow
 
 1. click "create new speech" in the top-right corner of the page
 2. select the type(s) of analysis you'd like — content, delivery, or both
@@ -48,3 +58,10 @@ PORT=8000
 4. click "next" to begin the analysis process
 5. review your results and choose to either finish the session or rehearse again
 6. if you choose to rehearse again, repeat steps 2-5 as needed for additional practice or feedback
+
+### viewing past speeches and rehearsals
+
+1. from the home page, click on an existing speech
+2. find and click the specific rehearsal you're looking for
+3. view your past analysis
+4. go back to all the rehearsals or exit to the home page
