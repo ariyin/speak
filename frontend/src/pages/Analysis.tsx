@@ -241,7 +241,6 @@ function Analysis() {
       </div>
       <div className="flex justify-end gap-4">
         <button onClick={handleRehearseAgain}>rehearse again</button>
-        {/* TODO: do we want a summary of their current run or everything */}
         <NavLink to={`/speech/${getCurrentSpeech()}/summary`}>
           <button>finish</button>
         </NavLink>

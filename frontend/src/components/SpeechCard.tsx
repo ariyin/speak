@@ -67,7 +67,7 @@ function SpeechCard({ speech }: { speech: Speech }) {
         </div>
         <div className="flex flex-col justify-between">
           <div>
-            <h3>speech {speech.id}</h3>
+            <h3>{speech.name}</h3>
             <p className="text-sm text-gray-600">
               {speech.rehearsals.length} rehearsal
               {speech.rehearsals.length !== 1 ? "s" : ""}

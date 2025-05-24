@@ -26,9 +26,12 @@ function RehearsalCard({ rehearsal }: RehearsalCardProps) {
           </p>
         )}
       </div>
-      <p className="text-sm text-gray-600">
-        date | {(rehearsal.duration / 60).toFixed(1)} min
-      </p>
+      <div className="flex justify-between">
+        <p className="text-sm text-gray-600">{rehearsal.date}</p>
+        <p className="text-sm text-gray-600">
+          {(rehearsal.duration / 60).toFixed(1)} min
+        </p>
+      </div>
     </NavLink>
   );
 }

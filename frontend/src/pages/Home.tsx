@@ -40,7 +40,7 @@ function Home() {
       const response = await axios.post("http://localhost:8000/speech/", {
         speech: {
           userId: userId,
-          name: "",
+          name: "Untitled Speech",
           practiceTime: 0,
           rehearsals: [],
         },
