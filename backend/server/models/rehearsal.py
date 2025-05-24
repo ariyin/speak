@@ -29,6 +29,7 @@ class RehearsalSchema(BaseModel):
 class UpdateRehearsalSchema(BaseModel):
     analysis: Optional[List[str]] = None
     videoUrl: Optional[str] = None
+    duration: Optional[float] = None
     content: Optional[Dict[str, str]] = None
     contentAnalysis: Optional[Dict] = None
     deliveryAnalysis: Optional[Dict] = None

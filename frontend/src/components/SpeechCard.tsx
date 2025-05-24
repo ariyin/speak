@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Speech } from "../utils/speechService";
-import axios from "axios";
-import type { Rehearsal } from "../utils/rehearsalService";
 import { addSpeech } from "../utils/auth";
 
 function SpeechCard({ speech }: { speech: Speech }) {
@@ -14,32 +11,6 @@ function SpeechCard({ speech }: { speech: Speech }) {
   // if (error) return <div>{error}</div>;
   // if (!speech) return null;
   const navigate = useNavigate();
-  const [rehearsals, setRehearsals] = useState<(Rehearsal | null)[]>([null]);
-
-  useEffect(() => {
-    const fetchRehearsals = async () => {
-      const fetched: (Rehearsal | null)[] = [];
-
-      for (const r of speech.rehearsals) {
-        try {
-          const response = await axios.get(
-            `http://localhost:8000/rehearsal/${r}`,
-          );
-          fetched.push(response.data);
-        } catch (err) {
-          console.warn("Failed to fetch rehearsal:", err);
-          fetched.push(null); // Explicitly push null if fetch fails
-        }
-      }
-
-      setRehearsals(fetched);
-    };
-
-    fetchRehearsals();
-  }, [speech.rehearsals]);
-
-  // get the first rehearsal with a video URL for the thumbnail
-  const thumbnailRehearsal = rehearsals.find((r) => r?.videoUrl);
 
   const handleClick = () => {
     addSpeech(speech.id);
@@ -53,9 +24,9 @@ function SpeechCard({ speech }: { speech: Speech }) {
     >
       <div className="flex flex-col gap-4">
         <div className="aspect-video rounded bg-gray-200">
-          {thumbnailRehearsal ? (
+          {speech.thumbnailUrl ? (
             <img
-              src={thumbnailRehearsal.videoUrl!.replace(".mp4", ".jpg")}
+              src={speech.thumbnailUrl}
               alt="speech thumbnail"
               className="h-full w-full object-cover"
             />

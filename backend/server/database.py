@@ -34,6 +34,7 @@ def speech_helper(speech) -> dict:
         "name": speech.get("name", "Untitled Speech"),  # default name if not set
         "practiceTime": speech.get("practiceTime", 0.0),  # default to 0 if not set
         "rehearsals": [str(rehearsal) for rehearsal in speech["rehearsals"]],
+        "thumbnailUrl": speech.get("thumbnailUrl"),
     }
 
 async def add_speech(speech_data: dict) -> dict:
@@ -111,18 +112,35 @@ async def retrieve_rehearsal(rehearsal_id: str) -> dict:
         return rehearsal_helper(rehearsal)
     return None
 
+# convert a video URL to a thumbnail URL by replacing the extension with .jpg
+def get_thumbnail_url(video_url: str) -> str:
+    print(video_url)
+    # remove any query parameters
+    base_url = video_url.split('?')[0]
+    # replace the extension with .jpg
+    return base_url.rsplit('.', 1)[0] + '.jpg'
+
 async def update_rehearsal(rehearsal_id: str, data: dict) -> bool:
     if len(data) < 1:
         return False
     rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})    
     if rehearsal:
-        # if we're updating the video URL and have duration, update practice time
-        if "videoUrl" in data and "duration" in data and data["duration"]:
+        # if we're updating the video URL and have duration, update practice time and thumbnail
+        if "videoUrl" in data and data["videoUrl"]:
             # update the speech's practice time using the provided duration
-            await speech_collection.update_one(
-                {"_id": ObjectId(rehearsal["speech"])},
-                {"$inc": {"practiceTime": data["duration"]}}
-            )
+            if "duration" in data and data["duration"]:
+                await speech_collection.update_one(
+                    {"_id": ObjectId(rehearsal["speech"])},
+                    {"$inc": {"practiceTime": data["duration"]}}
+                )
+            
+            # update the speech's thumbnail URL
+            thumbnail_url = get_thumbnail_url(data["videoUrl"])
+            if thumbnail_url:
+                await speech_collection.update_one(
+                    {"_id": ObjectId(rehearsal["speech"])},
+                    {"$set": {"thumbnailUrl": thumbnail_url}}
+                )
         
         updated_rehearsal = await rehearsal_collection.update_one(
             {"_id": ObjectId(rehearsal_id)}, 

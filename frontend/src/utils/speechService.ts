@@ -5,4 +5,5 @@ export interface Speech {
   name: string;
   practiceTime: number;
   rehearsals: Rehearsal[];
+  thumbnailUrl: string;
 }
