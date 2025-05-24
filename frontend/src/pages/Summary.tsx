@@ -58,22 +58,6 @@ function Summary() {
   //   );
   // }
 
-  // calculate total practice time in minutes
-  const totalPracticeTime =
-    rehearsals.reduce(
-      (total, rehearsal) => total + (rehearsal?.duration || 0),
-      0,
-    ) / 60; // convert seconds to minutes
-
-  // count only non-null rehearsals
-  const rehearsalCount = rehearsals.filter((r) => r !== null).length;
-
-  // sort rehearsals by ID (which should correspond to creation time)
-  const sortedRehearsals = [...rehearsals].sort((a, b) => {
-    if (!a || !b) return 0;
-    return a.id.localeCompare(b.id);
-  });
-
   return (
     <div className="layout-t">
       <NavLink to="/">
@@ -81,21 +65,19 @@ function Summary() {
       </NavLink>
       <div className="flex flex-col gap-8">
         <div>
-          <h1>speech {speech?.id}</h1>
+          <h1>{speech?.name}</h1>
           <p className="text-gray-600">
-            {rehearsalCount} rehearsal{rehearsalCount !== 1 ? "s" : ""} |{" "}
-            {totalPracticeTime.toFixed(1)} minutes of practice
+            {rehearsals.length} rehearsal{rehearsals.length !== 1 ? "s" : ""} |{" "}
+            {speech?.practiceTime ? (speech.practiceTime / 60).toFixed(1) : 0}{" "}
+            minutes of practice
           </p>
         </div>
         <div className="flex w-full flex-col items-center gap-10">
-          {sortedRehearsals.map(
-            (rehearsal) =>
-              rehearsal && (
-                <div key={rehearsal.id} className="w-1/2">
-                  <RehearsalCard rehearsal={rehearsal} />
-                </div>
-              ),
-          )}
+          {rehearsals.map((rehearsal) => (
+            <div key={rehearsal.id} className="w-1/2">
+              <RehearsalCard rehearsal={rehearsal} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

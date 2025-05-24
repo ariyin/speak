@@ -3,16 +3,23 @@ from bson import ObjectId
 from pydantic.functional_validators import BeforeValidator
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
+from datetime import datetime
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
+
+# returns today's date in MM/DD/YYYY format
+def get_today_date() -> str:
+    return datetime.now().strftime("%m/%d/%Y")
 
 class RehearsalSchema(BaseModel):
     analysis: List[str] = []
     speech: PyObjectId
     videoUrl: Optional[str] = None
+    duration: Optional[float] = None
     content: Optional[Dict[str, str]] = None
     contentAnalysis: Optional[Dict] = None
     deliveryAnalysis: Optional[Dict] = None
+    date: str = Field(default_factory=get_today_date)  # will automatically set to today's date in MM/DD/YYYY format
 
     class Config:
         populate_by_name = True
@@ -22,6 +29,7 @@ class RehearsalSchema(BaseModel):
 class UpdateRehearsalSchema(BaseModel):
     analysis: Optional[List[str]] = None
     videoUrl: Optional[str] = None
+    duration: Optional[float] = None
     content: Optional[Dict[str, str]] = None
     contentAnalysis: Optional[Dict] = None
     deliveryAnalysis: Optional[Dict] = None

@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from bson.objectid import ObjectId
 import motor.motor_asyncio
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -20,12 +21,20 @@ async def connect_speech_rehearsal(speech_id: str, rehearsal_id: str):
     await speech_collection.update_one({"_id": ObjectId(speech_id)}, {"$push": {"rehearsals": ObjectId(rehearsal_id)}})
     await rehearsal_collection.update_one({"_id": ObjectId(rehearsal_id)}, {"$set": {"speech": ObjectId(speech_id)}})
 
-# speech
+# returns today's date in MM/DD/YYYY format
+def get_today_date() -> str:
+    return datetime.now().strftime("%m/%d/%Y")
+
+# speech helpers
+
 def speech_helper(speech) -> dict:
     return {
         "id": str(speech["_id"]),
         "userId": str(speech["userId"]),
+        "name": speech.get("name", "Untitled Speech"),  # default name if not set
+        "practiceTime": speech.get("practiceTime", 0.0),  # default to 0 if not set
         "rehearsals": [str(rehearsal) for rehearsal in speech["rehearsals"]],
+        "thumbnailUrl": speech.get("thumbnailUrl"),
     }
 
 async def add_speech(speech_data: dict) -> dict:
@@ -62,6 +71,16 @@ async def delete_speech(speech_id: str) -> bool:
         return True
     return False
 
+async def update_speech_name(speech_id: str, name: str) -> bool:
+    speech = await speech_collection.find_one({"_id": ObjectId(speech_id)})
+    if speech:
+        updated_speech = await speech_collection.update_one(
+            {"_id": ObjectId(speech_id)},
+            {"$set": {"name": name}}
+        )
+        return updated_speech.matched_count > 0
+    return False
+
 # rehearsal helpers
 
 def rehearsal_helper(rehearsal) -> dict:
@@ -70,8 +89,10 @@ def rehearsal_helper(rehearsal) -> dict:
         "analysis": rehearsal["analysis"],
         "speech": str(rehearsal["speech"]),
         "videoUrl": rehearsal["videoUrl"],
+        "duration": rehearsal.get("duration"),
         "deliveryAnalysis": rehearsal.get("deliveryAnalysis"),
         "contentAnalysis": rehearsal.get("contentAnalysis"),
+        "date": rehearsal.get("date", get_today_date())
     }
 
 async def add_rehearsal(rehearsal_data: dict) -> dict:
@@ -91,12 +112,40 @@ async def retrieve_rehearsal(rehearsal_id: str) -> dict:
         return rehearsal_helper(rehearsal)
     return None
 
+# convert a video URL to a thumbnail URL by replacing the extension with .jpg
+def get_thumbnail_url(video_url: str) -> str:
+    print(video_url)
+    # remove any query parameters
+    base_url = video_url.split('?')[0]
+    # replace the extension with .jpg
+    return base_url.rsplit('.', 1)[0] + '.jpg'
+
 async def update_rehearsal(rehearsal_id: str, data: dict) -> bool:
     if len(data) < 1:
         return False
     rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})    
     if rehearsal:
-        updated_rehearsal = await rehearsal_collection.update_one({"_id": ObjectId(rehearsal_id)}, {"$set": data})
+        # if we're updating the video URL and have duration, update practice time and thumbnail
+        if "videoUrl" in data and data["videoUrl"]:
+            # update the speech's practice time using the provided duration
+            if "duration" in data and data["duration"]:
+                await speech_collection.update_one(
+                    {"_id": ObjectId(rehearsal["speech"])},
+                    {"$inc": {"practiceTime": data["duration"]}}
+                )
+            
+            # update the speech's thumbnail URL
+            thumbnail_url = get_thumbnail_url(data["videoUrl"])
+            if thumbnail_url:
+                await speech_collection.update_one(
+                    {"_id": ObjectId(rehearsal["speech"])},
+                    {"$set": {"thumbnailUrl": thumbnail_url}}
+                )
+        
+        updated_rehearsal = await rehearsal_collection.update_one(
+            {"_id": ObjectId(rehearsal_id)}, 
+            {"$set": data}
+        )
         return updated_rehearsal.matched_count > 0
     return False
     

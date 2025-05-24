@@ -31,12 +31,15 @@ async def update_rehearsal_content(id: str, req: UpdateRehearsalSchema = Body(..
         return ResponseModel(res, "Rehearsal updated successfully.")
     return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
 
-@router.patch("/video_url/{id}", response_description="Rehearsal video URL updated")
+@router.patch("/video_url/{id}", response_description="Rehearsal video URL and duration updated")
 async def update_rehearsal_video_url(id: str, req: UpdateRehearsalSchema = Body(...)):
-    video_url = { "videoUrl": req.videoUrl}
-    updated_rehearsal = await update_rehearsal(id, video_url)
+    video_data = {
+        "videoUrl": req.videoUrl,
+        "duration": req.duration
+    }
+    updated_rehearsal = await update_rehearsal(id, video_data)
     if updated_rehearsal:
-        res = { "response": "Rehearsal {} updated succesfully".format(id)}
+        res = { "response": "Rehearsal {} updated successfully".format(id)}
         return ResponseModel(res, "Rehearsal updated successfully.")
     return ErrorResponseModel("An error occurred.", 404, "Rehearsal not found")
 
