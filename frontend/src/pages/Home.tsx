@@ -16,7 +16,9 @@ function Home() {
         const response = await axios.get(
           `http://localhost:8000/speech/user/${userId}`,
         );
-        setSpeeches(response.data.speeches.map((speech: Speech) => speech));
+        if (response.data.speeches) {
+          setSpeeches(response.data.speeches.map((speech: Speech) => speech));
+        }
       } catch (err) {
         // setError("Failed to load speeches");
         console.error("Error fetching speeches:", err);
@@ -38,6 +40,8 @@ function Home() {
       const response = await axios.post("http://localhost:8000/speech/", {
         speech: {
           userId: userId,
+          name: "",
+          practiceTime: 0,
           rehearsals: [],
         },
         rehearsal: {

@@ -43,17 +43,23 @@ function Video() {
 
   const handleNext = async () => {
     if (!videoFile) return;
-    const { secureUrl, publicId } = await uploadFileToCloudinary(videoFile);
+    const { secureUrl, publicId, duration } =
+      await uploadFileToCloudinary(videoFile);
 
     // Update rehearsal with link for preview
     try {
-      await axios.patch(`http://localhost:8000/rehearsal/video_url/${rehearsalId}/`, { videoUrl: secureUrl, } );
+      await axios.patch(
+        `http://localhost:8000/rehearsal/video_url/${rehearsalId}`,
+        { videoUrl: secureUrl, duration: duration },
+      );
     } catch (error) {
       console.error("Error updating rehearsal video url:", error);
     }
 
     // navigate or pass along publicId
-    navigate(`/rehearsal/${rehearsalId}/analysis`, { state: { publicId, secureUrl }});
+    navigate(`/rehearsal/${rehearsalId}/analysis`, {
+      state: { publicId, secureUrl },
+    });
   };
 
   function clearUpload() {

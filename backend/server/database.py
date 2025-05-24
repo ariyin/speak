@@ -25,6 +25,8 @@ def speech_helper(speech) -> dict:
     return {
         "id": str(speech["_id"]),
         "userId": str(speech["userId"]),
+        "name": speech.get("name", "Untitled Speech"),  # default name if not set
+        "practiceTime": speech.get("practiceTime", 0.0),  # default to 0 if not set
         "rehearsals": [str(rehearsal) for rehearsal in speech["rehearsals"]],
     }
 
@@ -62,6 +64,16 @@ async def delete_speech(speech_id: str) -> bool:
         return True
     return False
 
+async def update_speech_name(speech_id: str, name: str) -> bool:
+    speech = await speech_collection.find_one({"_id": ObjectId(speech_id)})
+    if speech:
+        updated_speech = await speech_collection.update_one(
+            {"_id": ObjectId(speech_id)},
+            {"$set": {"name": name}}
+        )
+        return updated_speech.matched_count > 0
+    return False
+
 # rehearsal helpers
 
 def rehearsal_helper(rehearsal) -> dict:
@@ -96,7 +108,19 @@ async def update_rehearsal(rehearsal_id: str, data: dict) -> bool:
         return False
     rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})    
     if rehearsal:
-        updated_rehearsal = await rehearsal_collection.update_one({"_id": ObjectId(rehearsal_id)}, {"$set": data})
+        # if we're updating the video URL and have duration, update practice time
+        if "videoUrl" in data and "duration" in data and data["duration"]:
+            print(data["duration"])
+            # update the speech's practice time using the provided duration
+            await speech_collection.update_one(
+                {"_id": ObjectId(rehearsal["speech"])},
+                {"$inc": {"practiceTime": data["duration"]}}
+            )
+        
+        updated_rehearsal = await rehearsal_collection.update_one(
+            {"_id": ObjectId(rehearsal_id)}, 
+            {"$set": data}
+        )
         return updated_rehearsal.matched_count > 0
     return False
     

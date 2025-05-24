@@ -38,13 +38,6 @@ function SpeechCard({ speech }: { speech: Speech }) {
     fetchRehearsals();
   }, [speech.rehearsals]);
 
-  // calculate total practice time in minutes
-  const totalPracticeTime =
-    rehearsals.reduce(
-      (total, rehearsal) => total + (rehearsal?.duration || 0),
-      0,
-    ) / 60; // convert seconds to minutes
-
   // get the first rehearsal with a video URL for the thumbnail
   const thumbnailRehearsal = rehearsals.find((r) => r?.videoUrl);
 
@@ -60,11 +53,10 @@ function SpeechCard({ speech }: { speech: Speech }) {
     >
       <div className="flex flex-col gap-4">
         <div className="aspect-video rounded bg-gray-200">
-          {/* TODO: check file format works */}
           {thumbnailRehearsal ? (
             <img
               src={thumbnailRehearsal.videoUrl!.replace(".mp4", ".jpg")}
-              alt="Speech thumbnail"
+              alt="speech thumbnail"
               className="h-full w-full object-cover"
             />
           ) : (
@@ -82,7 +74,7 @@ function SpeechCard({ speech }: { speech: Speech }) {
             </p>
           </div>
           <p className="text-sm text-gray-600">
-            {totalPracticeTime.toFixed(1)} minutes of practice
+            {(speech.practiceTime / 60).toFixed(1)} minutes of practice
           </p>
         </div>
       </div>
