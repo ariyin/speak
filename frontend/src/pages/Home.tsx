@@ -20,24 +20,26 @@ function Home() {
   const [speeches, setSpeeches] = useState<Speech[]>([]);
   const [speechName, setSpeechName] = useState("Untitled Speech");
 
-  useEffect(() => {
-    const fetchSpeeches = async () => {
-      try {
-        const userId = getUserId();
-        const response = await axios.get(
-          `http://localhost:8000/speech/user/${userId}`,
-        );
-        if (response.data.speeches) {
-          setSpeeches(response.data.speeches.map((speech: Speech) => speech));
-        }
-      } catch (err) {
-        // setError("Failed to load speeches");
-        console.error("Error fetching speeches:", err);
-      } finally {
-        // setLoading(false);
+  const fetchSpeeches = async () => {
+    try {
+      const userId = getUserId();
+      const response = await axios.get(
+        `http://localhost:8000/speech/user/${userId}`,
+      );
+      if (response.data.speeches) {
+        setSpeeches(response.data.speeches.map((speech: Speech) => speech));
+      } else {
+        setSpeeches([]);
       }
-    };
+    } catch (err) {
+      // setError("Failed to load speeches");
+      console.error("Error fetching speeches:", err);
+    } finally {
+      // setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchSpeeches();
   }, []);
 
@@ -106,7 +108,11 @@ function Home() {
       ) : (
         <div className="grid h-full grid-cols-3 gap-10">
           {speeches.map((speech) => (
-            <SpeechCard key={speech.id} speech={speech} />
+            <SpeechCard
+              key={speech.id}
+              speech={speech}
+              onSpeechUpdate={fetchSpeeches}
+            />
           ))}
         </div>
       )}
