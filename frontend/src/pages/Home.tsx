@@ -106,7 +106,7 @@ function Home() {
           <p className="mt-2">create your first speech to get started!</p>
         </div>
       ) : (
-        <div className="grid h-full grid-cols-3 gap-10">
+        <div className="grid grid-cols-3 gap-10 self-start">
           {speeches.map((speech) => (
             <SpeechCard
               key={speech.id}

@@ -8,9 +8,14 @@ from server.database import (
     delete_speech,
     retrieve_speeches,
     retrieve_speech,
+    update_speech_name,
 )
-from server.models.speech import (SpeechSchema,     ErrorResponseModel,
-    ResponseModel,)
+from server.models.speech import (
+    SpeechSchema,
+    UpdateSpeechSchema,
+    ErrorResponseModel,
+    ResponseModel,
+)
 from server.models.rehearsal import RehearsalSchema
 
 router = APIRouter()
@@ -51,3 +56,18 @@ async def get_speeches_by_user(id: str):
         }
         return ResponseModel(data, "Speeches successfully retrieved.")
     return ErrorResponseModel("An error occurred.", 404, "Speeches not found")
+
+@router.patch("/name/{id}", response_description="Speech name updated")
+async def update_speech_name_data(id: str, req: UpdateSpeechSchema = Body(...)):
+    if not req.name:
+        return ErrorResponseModel(
+            "Invalid request", 
+            400, 
+            "Name field is required"
+        )
+        
+    updated_speech = await update_speech_name(id, req.name)
+    if updated_speech:
+        res = { "response": "Speech {} updated successfully".format(id)}
+        return ResponseModel(res, "Speech name updated successfully.")
+    return ErrorResponseModel("An error occurred.", 404, "Speech not found")
