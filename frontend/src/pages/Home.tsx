@@ -4,29 +4,42 @@ import axios from "axios";
 import SpeechCard from "../components/SpeechCard";
 import { getUserId, addSpeech, addRehearsal } from "../utils/auth";
 import type { Speech } from "../utils/speechService";
+import logo from "../assets/speak-full.svg";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 function Home() {
   const navigate = useNavigate();
   const [speeches, setSpeeches] = useState<Speech[]>([]);
+  const [speechName, setSpeechName] = useState("Untitled Speech");
+
+  const fetchSpeeches = async () => {
+    try {
+      const userId = getUserId();
+      const response = await axios.get(
+        `http://localhost:8000/speech/user/${userId}`,
+      );
+      if (response.data.speeches) {
+        setSpeeches(response.data.speeches.map((speech: Speech) => speech));
+      } else {
+        setSpeeches([]);
+      }
+    } catch (err) {
+      // setError("Failed to load speeches");
+      console.error("Error fetching speeches:", err);
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSpeeches = async () => {
-      try {
-        const userId = getUserId();
-        const response = await axios.get(
-          `http://localhost:8000/speech/user/${userId}`,
-        );
-        if (response.data.speeches) {
-          setSpeeches(response.data.speeches.map((speech: Speech) => speech));
-        }
-      } catch (err) {
-        // setError("Failed to load speeches");
-        console.error("Error fetching speeches:", err);
-      } finally {
-        // setLoading(false);
-      }
-    };
-
     fetchSpeeches();
   }, []);
 
@@ -40,7 +53,7 @@ function Home() {
       const response = await axios.post("http://localhost:8000/speech/", {
         speech: {
           userId: userId,
-          name: "Untitled Speech",
+          name: speechName,
           practiceTime: 0,
           rehearsals: [],
         },
@@ -63,18 +76,43 @@ function Home() {
 
   return (
     <div className="layout-t">
-      <button className="justify-self-end" onClick={handleCreateSpeech}>
-        create new speech
-      </button>
+      <div className="flex items-center justify-between">
+        <img src={logo} className="h-12" />
+        <Dialog>
+          <DialogTrigger>create new speech</DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>create new speech</DialogTitle>
+              <DialogDescription>
+                <div className="flex flex-col items-start gap-2">
+                  <label>name</label>
+                  <input
+                    value={speechName}
+                    onChange={(e) => setSpeechName(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <button onClick={handleCreateSpeech}>create</button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
       {speeches.length === 0 ? (
         <div className="justify-self-center text-center text-gray-400">
           <h1>no speeches available</h1>
           <p className="mt-2">create your first speech to get started!</p>
         </div>
       ) : (
-        <div className="grid h-full grid-cols-3 gap-10">
+        <div className="grid grid-cols-3 gap-10 self-start">
           {speeches.map((speech) => (
-            <SpeechCard key={speech.id} speech={speech} />
+            <SpeechCard
+              key={speech.id}
+              speech={speech}
+              onSpeechUpdate={fetchSpeeches}
+            />
           ))}
         </div>
       )}

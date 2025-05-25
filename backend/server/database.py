@@ -67,6 +67,9 @@ async def update_speech(speech_id: str, data: dict) -> bool:
 async def delete_speech(speech_id: str) -> bool:  
     speech = await speech_collection.find_one({"_id": ObjectId(speech_id)})
     if speech:
+        # delete all rehearsals associated with this speech
+        await rehearsal_collection.delete_many({"speech": ObjectId(speech_id)})
+        # delete the speech
         await speech_collection.delete_one({"_id": ObjectId(speech_id)})
         return True
     return False
