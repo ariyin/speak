@@ -1,4 +1,4 @@
-![speak logo](frontend/public/speak-full.svg)
+![speak logo](./frontend/src/assets/speak-full.svg)
 
 designed to ease public speaking anxiety and boost your confidence. get targeted feedback on how closely your speech matches your prepared outline or script, along with insights on filler words, pacing, and body language.
 
