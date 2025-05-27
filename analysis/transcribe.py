@@ -4,19 +4,13 @@ import uuid
 from pathlib import Path
 from transcript_analysis import analyze_transcript
 
-from ollama import Client
-
 import os
 from dotenv import load_dotenv
 
-import os
-from dotenv import load_dotenv
-
-from fastapi import FastAPI, File, UploadFile, HTTPException, HTTPException, Body
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, HttpUrl
-from typing import List, Dict
 
 import ffmpeg                  # ffmpeg-python wrapper
 import whisper                 # OpenAI Whisper local
@@ -27,8 +21,6 @@ from google.genai.types import Part, GenerateContentConfig
 import uvicorn
 import json
 import mimetypes
-from openai import OpenAI
-from openai import OpenAI
 
 app = FastAPI()
 app.add_middleware(
@@ -38,7 +30,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-client = Client()
+
 model = whisper.load_model("small")   # or "base", "medium", "large"
 
 from prompts import (
