@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useNavigate, Navigate } from "react-router-dom";
+import axios from "axios";
+import RehearsalCard from "../components/RehearsalCard";
 import type { Speech } from "../utils/speechService";
 import type { Rehearsal } from "../utils/rehearsalService";
-import RehearsalCard from "../components/RehearsalCard";
-import axios from "axios";
+import { addRehearsal } from "../utils/auth";
 
 function Summary() {
   const { speechId } = useParams();
+  const navigate = useNavigate();
   const [speech, setSpeech] = useState<Speech | null>(null);
   const [rehearsals, setRehearsals] = useState<Rehearsal[]>([]);
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSpeech = async () => {
@@ -28,39 +29,49 @@ function Summary() {
         const rehearsalData = rehearsalResponses.map((res) => res.data);
         setRehearsals(rehearsalData);
       } catch (err) {
-        // setError("Failed to load speech");
         console.error("Error fetching speech:", err);
+      } finally {
+        setLoading(false);
       }
-      // } finally {
-      //   setLoading(false);
-      // }
     };
 
     fetchSpeech();
   }, [speechId]);
 
-  // redirect to home if there's an error
-  // if (error) {
-  //   return <Navigate to="/" replace />;
-  // }
+  const handleAddRehearsal = async () => {
+    try {
+      // create a new rehearsal for the current speech
+      const response = await axios.post("http://localhost:8000/rehearsal/", {
+        speech: speechId,
+      });
 
-  // show loading state
-  // if (loading || !speech) {
-  //   return (
-  //     <div className="layout-tb">
-  //       <NavLink to="/">
-  //         <button>back to home</button>
-  //       </NavLink>
-  //       <div className="flex h-full items-center justify-center">
-  //         <p>Loading...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+      // update current rehearsal in localStorage
+      addRehearsal(response.data.rehearsal.id);
+
+      // navigate to the type page for the new rehearsal
+      navigate(`/rehearsal/${response.data.rehearsal.id}/type`);
+    } catch (error) {
+      console.error("Error creating new rehearsal:", error);
+    }
+  };
+
+  // loading state
+  if (loading || !speech) {
+    return (
+      <div className="layout-tb">
+        <NavLink to="/" className="justify-self-end">
+          <button>back to home</button>
+        </NavLink>
+        <div className="flex h-full items-center justify-center">
+          <p className="text-gray-400">loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="layout-t">
-      <NavLink to="/">
+      <NavLink to="/" className="justify-self-end">
         <button>back to home</button>
       </NavLink>
       <div className="flex flex-col gap-8">
@@ -73,11 +84,22 @@ function Summary() {
           </p>
         </div>
         <div className="flex w-full flex-col items-center gap-10">
+          {/* rehearsal cards */}
           {rehearsals.map((rehearsal) => (
-            <div key={rehearsal.id} className="w-1/2">
-              <RehearsalCard rehearsal={rehearsal} />
+            <div
+              key={rehearsal.id}
+              className="flex w-full flex-col items-center gap-5"
+            >
+              <div className="w-1/2">
+                <RehearsalCard rehearsal={rehearsal} />
+              </div>
+              {/* vertical line */}
+              <div className="bg-cherry h-10 w-0.5" />
             </div>
           ))}
+          <button className="w-fit" onClick={handleAddRehearsal}>
+            add new rehearsal
+          </button>
         </div>
       </div>
     </div>
