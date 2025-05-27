@@ -3,7 +3,7 @@ import json
 import time
 from ollama import Client
 from collections import Counter
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 FILLER_PROMPT_TEMPLATE = """
 You are given a portion of a spoken transcript. Your task is to extract only the **filler words or phrases** used in context.
@@ -24,6 +24,11 @@ Return **only** the JSON—no explanations, no additional text.
 Transcript:
 {text}
 """
+
+from prompts import (
+    content_analysis_outline_prompt,
+    content_analysis_script_prompt
+)
 
 client = Client()
 
@@ -99,13 +104,45 @@ def calculate_speech_rate(result: dict) -> float:
     words_per_minute = (word_count / duration_sec) * 60
     return round(words_per_minute, 2)
 
+# CONTENT ANALYSIS 
+
+async def analyze_content_outline(outline: str, transcript: str):
+    """
+    Analyzes the content outline and transcript for coherence, flow, and engagement. Gives feedback to user on how
+    well what they are saying (the transcript) matches what they are trying to say (the outline).
+    """
+    prompt = content_analysis_outline_prompt.format(outline=outline, transcript=transcript)
+
+    ## Feed into Lllama 3 here
+    response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+    print("RAW: " + response.message.content)
+
+    return json.loads(response.message.content)
+
+async def analyze_content_script(script: str, transcript: str):
+    """
+    Analyzes the content outline and transcript for coherence, flow, and engagement. Gives feedback to user on how
+    well what they are saying (the transcript) matches what they are trying to say (the outline).
+    """
+    prompt = content_analysis_script_prompt.format(script = script, transcript=transcript)
+
+    ## Feed into Lllama 3 here
+    response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+    print("RAW: " + response.message.content)
+
+    return json.loads(response.message.content)
 
 
-def analyze_transcript(result: dict):
-    return {
+def analyze_transcript(result: dict, outline: Optional[str] = None, script: Optional[str] = None, transcript: Optional[str] = None) -> dict:
+    output = {
         "speech_rate_wpm": calculate_speech_rate(result),
         "filler_words": summarize_filler_word_counts(detect_filler_words_with_gpt(result))
     }
+    if outline:
+        output["content_analysis"] = analyze_content_outline(outline, transcript)
+    if script:
+        output["script_analysis"] = analyze_content_script(script, transcript)
+    return output
 
 
 # HELPERS
