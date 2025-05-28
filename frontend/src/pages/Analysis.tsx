@@ -19,6 +19,14 @@ function Analysis() {
   const publicId = state?.publicId;
   const secureUrl = state?.secureUrl;
 
+  const handleTimestampClick = (timestamp: string) => {
+    if (!playerRef.current) return;
+    const [minutes, seconds] = timestamp.split(":").map(Number);
+    const totalSeconds = minutes * 60 + seconds;
+    // seek to the timestamp
+    playerRef.current.currentTime(totalSeconds);
+  };
+
   useEffect(() => {
     const analyze = async () => {
       try {
@@ -49,7 +57,7 @@ function Analysis() {
           // Analyze transcript
           const t_response = await axios.post(
             "http://localhost:9000/analyze_transcript/",
-            { url: secureUrl },
+            { video_url: secureUrl },
           );
 
           if (t_response.status !== 200) {
@@ -63,7 +71,7 @@ function Analysis() {
           // Analyze body language (placeholder)
           const b_response = await axios.post(
             "http://localhost:9000/analyze_body_language/",
-            { url: secureUrl },
+            { video_url: secureUrl },
           );
 
           if (b_response.status !== 200) {
@@ -205,7 +213,17 @@ function Analysis() {
                     deliveryData.body_language_analysis.pros.map(
                       ({ timestamp, description }, idx) => (
                         <li key={idx}>
-                          <strong>{timestamp}</strong>: {description}
+                          {timestamp.split(",").map((t, i) => (
+                            <button
+                              key={i}
+                              onClick={() => handleTimestampClick(t.trim())}
+                              className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
+                              type="button"
+                            >
+                              <strong>{t.trim()}</strong>
+                            </button>
+                          ))}
+                          : {description}
                         </li>
                       ),
                     )
@@ -224,7 +242,17 @@ function Analysis() {
                     deliveryData.body_language_analysis.cons.map(
                       ({ timestamp, description }, idx) => (
                         <li key={idx}>
-                          <strong>{timestamp}</strong>: {description}
+                          {timestamp.split(",").map((t, i) => (
+                            <button
+                              key={i}
+                              onClick={() => handleTimestampClick(t.trim())}
+                              className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
+                              type="button"
+                            >
+                              <strong>{t.trim()}</strong>
+                            </button>
+                          ))}
+                          : {description}
                         </li>
                       ),
                     )
