@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import fixWebmDuration from "fix-webm-duration";
 
 interface RecordingModalProps {
   onClose: () => void;
-  onRecorded: (file: File) => void;
+  onRecorded: (file: File, duration: number) => void;
 }
 
 function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
@@ -12,6 +13,9 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
   const [recording, setRecording] = useState(false);
   const chunks = useRef<Blob[]>([]);
   const [isPaused, setIsPaused] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -19,9 +23,10 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
     navigator.mediaDevices
       .getUserMedia({
         video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 640 },
+          height: { ideal: 360 },
           aspectRatio: 16 / 9,
+          frameRate: { ideal: 30, max: 30 },
         },
         audio: true,
       })
@@ -32,17 +37,39 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
         ) as HTMLVideoElement;
         if (preview) {
           preview.srcObject = stream;
+          preview.playsInline = true;
+          preview.setAttribute("playsinline", "true");
         }
 
-        const recorder = new MediaRecorder(stream);
+        const recorder = new MediaRecorder(stream, {
+          mimeType: "video/webm;codecs=vp9,opus",
+          videoBitsPerSecond: 2500000,
+        });
+
         recorder.ondataavailable = (e) => chunks.current.push(e.data);
         recorder.onstop = async () => {
           const blob = new Blob(chunks.current, { type: "video/webm" });
-          const file = new File([blob], "recording.webm", {
-            type: "video/webm",
-          });
 
-          onRecorded(file);
+          const finalDuration = Math.floor(Date.now() - startTimeRef.current);
+
+          try {
+            // add duration metadata to blob
+            const fixedBlob = await fixWebmDuration(blob, finalDuration, {
+              logger: false,
+            });
+
+            const file = new File([fixedBlob], "recording.webm", {
+              type: "video/webm",
+            });
+
+            onRecorded(file, finalDuration);
+          } catch {
+            // fallback to original blob if fixing fails
+            const file = new File([blob], "recording.webm", {
+              type: "video/webm",
+            });
+            onRecorded(file, finalDuration);
+          }
           onClose();
         };
         setMediaRecorder(recorder);
@@ -53,6 +80,9 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop()); // stops the camera/mic
       }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
   }, []);
 
@@ -60,9 +90,25 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
     chunks.current = [];
     mediaRecorder?.start();
     setRecording(true);
+    // start timer
+    startTimeRef.current = Date.now();
+    timerRef.current = setInterval(() => {
+      setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
   };
 
   const stop = () => {
+    // get final duration before stopping
+    const finalDuration = Math.floor(
+      (Date.now() - startTimeRef.current) / 1000,
+    );
+    setDuration(finalDuration);
+
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     mediaRecorder?.stop();
     setRecording(false);
   };
@@ -73,15 +119,29 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
     if (isPaused) {
       mediaRecorder.resume();
       setIsPaused(false);
+      startTimeRef.current = Date.now() - duration * 1000;
+      timerRef.current = setInterval(() => {
+        setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      }, 1000);
     } else {
       mediaRecorder.pause();
       setIsPaused(true);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     }
   };
 
   return (
     <>
       <video id="camera-preview" autoPlay muted className="relative" />
+      {recording && (
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 rounded bg-black/50 px-2 py-1 text-white">
+          {Math.floor(duration / 60)}:
+          {(duration % 60).toString().padStart(2, "0")}
+        </div>
+      )}
       {!recording ? (
         <button onClick={start} className="absolute right-2 bottom-2">
           start
