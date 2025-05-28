@@ -2,10 +2,16 @@ import { useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import ExitButton from "../components/ExitButton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function Content() {
   const [content, setContent] = useState("");
-  const [contentType, setContentType] = useState<"speech" | "outline" | null>(
+  const [contentType, setContentType] = useState<"script" | "outline" | null>(
     null,
   );
   const navigate = useNavigate();
@@ -40,18 +46,32 @@ function Content() {
         <div className="flex flex-col items-center gap-5 text-center">
           <h1>what are you uploading?</h1>
           <div className="flex gap-5">
-            <button
-              className={contentType === "speech" ? "selected-button" : ""}
-              onClick={() => setContentType("speech")}
-            >
-              speech
-            </button>
-            <button
-              className={contentType === "outline" ? "selected-button" : ""}
-              onClick={() => setContentType("outline")}
-            >
-              outline
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger
+                  className={contentType === "script" ? "selected-button" : ""}
+                  onClick={() => setContentType("script")}
+                >
+                  script
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>fully written, word-for-word</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger
+                  className={contentType === "outline" ? "selected-button" : ""}
+                  onClick={() => setContentType("outline")}
+                >
+                  outline
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>key points or a structured guide</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
         <textarea

@@ -32,20 +32,13 @@ function Home() {
         setSpeeches([]);
       }
     } catch (err) {
-      // setError("Failed to load speeches");
       console.error("Error fetching speeches:", err);
-    } finally {
-      // setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchSpeeches();
   }, []);
-
-  // TODO: implement later
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
 
   const handleCreateSpeech = async () => {
     try {
@@ -70,9 +63,6 @@ function Home() {
       console.error("Error creating speech:", error);
     }
   };
-
-  // if (loading) return <div>Loading...</div>;
-  // if (error) return <div>{error}</div>;
 
   return (
     <div className="layout-t">

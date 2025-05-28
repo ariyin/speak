@@ -155,6 +155,12 @@ async def update_rehearsal(rehearsal_id: str, data: dict) -> bool:
 async def delete_rehearsal(rehearsal_id: str) -> bool:
     rehearsal = await rehearsal_collection.find_one({"_id": ObjectId(rehearsal_id)})
     if rehearsal:
+        # remove the rehearsal from the speech's rehearsals array
+        await speech_collection.update_one(
+            {"_id": ObjectId(rehearsal["speech"])},
+            {"$pull": {"rehearsals": ObjectId(rehearsal_id)}}
+        )
+        # delete the rehearsal
         await rehearsal_collection.delete_one({"_id": ObjectId(rehearsal_id)})
         return True
     return False

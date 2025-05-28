@@ -13,6 +13,7 @@ import Video from "./pages/Video";
 import Analysis from "./pages/Analysis";
 import Summary from "./pages/Summary";
 import { getCurrentRehearsal, getCurrentSpeech } from "./utils/auth";
+import PastAnalysis from "./pages/PastAnalysis";
 
 // route protection component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -67,6 +68,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Analysis />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rehearsal/:rehearsalId/past_analysis"
+          element={
+            <ProtectedRoute>
+              <PastAnalysis />
             </ProtectedRoute>
           }
         />
