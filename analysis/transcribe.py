@@ -1,5 +1,6 @@
 # app.py
 import shutil
+from typing import Optional
 import uuid
 from pathlib import Path
 from transcript_analysis import analyze_transcript
@@ -52,8 +53,8 @@ load_dotenv()
 # analyze request schema
 class AnalyzeRequest(BaseModel):
     video_url: HttpUrl
-    outline: str = None
-    script: str = None
+    outline: Optional[str] = None
+    script: Optional[str] = None
 
 def get_gemini_client():
     # Initialize the Gemini client (adjust auth if needed)

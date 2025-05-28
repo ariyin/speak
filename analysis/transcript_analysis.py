@@ -1,5 +1,6 @@
 import re
 import json
+from json_repair import repair_json
 import time
 from ollama import Client
 from collections import Counter
@@ -32,7 +33,7 @@ from prompts import (
 
 client = Client()
 
-def detect_filler_words_with_gpt(result: dict) -> list:
+def detect_filler_words(result: dict) -> list:
     all_words = result.get("segments")
 
     # Join words to make a full transcript
@@ -44,19 +45,13 @@ def detect_filler_words_with_gpt(result: dict) -> list:
     detected_fillers = []
 
     for i, chunk in enumerate(sentence_chunks):
-        print(f"RUN {i + 1}: ================")
         chunk = sentence_chunks[i]
-        print("INPUT: " + chunk)
         prompt = FILLER_PROMPT_TEMPLATE.format(text=chunk)
 
         # Send the chunk to Mistral for filler word detection
         response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
 
-        print("RAW: " + response.message.content)
-
-        filler_word_dict = extract_first_bracketed_content(response.message.content)
-
-        print("FILTERED: " + filler_word_dict)
+        filler_word_dict = repair_json(response.message.content)
 
         try:
             chunk_result = json.loads(filler_word_dict)
@@ -106,59 +101,43 @@ def calculate_speech_rate(result: dict) -> float:
 
 # CONTENT ANALYSIS 
 
-async def analyze_content_outline(outline: str, transcript: str):
+def analyze_content_outline(outline: str, transcript: List[List[str]]):
     """
     Analyzes the content outline and transcript for coherence, flow, and engagement. Gives feedback to user on how
     well what they are saying (the transcript) matches what they are trying to say (the outline).
     """
     prompt = content_analysis_outline_prompt.format(outline=outline, transcript=transcript)
 
-    ## Feed into Lllama 3 here
+    ## Feed into Llama 3 here
     response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
-    print("RAW: " + response.message.content)
 
-    return json.loads(response.message.content)
+    filtered_content = repair_json(response.message.content)
 
-async def analyze_content_script(script: str, transcript: str):
+    return json.loads(filtered_content)
+
+def analyze_content_script(script: str, transcript: List[List[str]]):
     """
-    Analyzes the content outline and transcript for coherence, flow, and engagement. Gives feedback to user on how
-    well what they are saying (the transcript) matches what they are trying to say (the outline).
+    Analyzes the content script and transcript for coherence, flow, and engagement. Gives feedback to user on how
+    well what they are saying (the transcript) matches what they are supposed to say (the script).
     """
     prompt = content_analysis_script_prompt.format(script = script, transcript=transcript)
 
-    ## Feed into Lllama 3 here
+    ## Feed into Llama 3 here
     response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
-    print("RAW: " + response.message.content)
 
-    return json.loads(response.message.content)
+    filtered_content = repair_json(response.message.content)
+
+    return json.loads(filtered_content)
 
 
 def analyze_transcript(result: dict, outline: Optional[str] = None, script: Optional[str] = None, transcript: Optional[str] = None) -> dict:
     output = {
         "speech_rate_wpm": calculate_speech_rate(result),
-        "filler_words": summarize_filler_word_counts(detect_filler_words_with_gpt(result))
+        "filler_words": summarize_filler_word_counts(detect_filler_words(result))
     }
+
     if outline:
-        output["content_analysis"] = analyze_content_outline(outline, transcript)
+        output["content_analysis"] = analyze_content_outline(outline, [[segment["start"], segment["text"]] for segment in result["segments"]])
     if script:
-        output["script_analysis"] = analyze_content_script(script, transcript)
+        output["script_analysis"] = analyze_content_script(script, [[segment["start"], segment["text"]] for segment in result["segments"]])
     return output
-
-
-# HELPERS
-
-def extract_first_bracketed_content(s: str) -> str:
-    start = s.find('[')
-    if start == -1:
-        return "[]"
-    
-    depth = 0
-    for i in range(start, len(s)):
-        if s[i] == '[':
-            depth += 1
-        elif s[i] == ']':
-            depth -= 1
-            if depth == 0:
-                return s[start:i + 1]
-    
-    return "[]"

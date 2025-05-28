@@ -2,7 +2,7 @@ content_analysis_outline_prompt = """
 You are a public speaking expert. I will provide:
 
 1. The speaker’s **content outline** (a list of points they intended to cover).  
-2. The actual **transcript** of what they said.
+2. The actual **transcript** of what they said, with timestamps.
 
 Your task is for **each** outline point, determine whether and how the transcript addresses it.
 
@@ -26,7 +26,7 @@ Return a JSON object with two arrays, `pros` and `cons`, for example:
     {{
       "outline_point": "Introduce the company’s history",
       "timestamp": "00:02:15",
-      "transcript_excerpt": "“We founded our startup in 2010 with a mission to….”",
+      "transcript_excerpt": "“We founded our startup in 2010 with a mission to...”",
       "suggestion": "Good start—perhaps add one anecdote for emotional impact."
     }}
   ],
@@ -53,7 +53,7 @@ content_analysis_script_prompt = """
 You are a public speaking analyst. I will provide you with two pieces of text:
 
 1. The speaker’s **original speech text** (the script or planned speech).  
-2. The **transcript** of what they actually said in their delivery.
+2. The **transcript** of what they actually said in their delivery, with timestamps.
 
 Your task is to compare them and identify all the meaningful differences:
 
@@ -71,32 +71,32 @@ For each difference, output an object with:
 Return a single JSON object with three arrays: `omissions`, `additions`, and `paraphrases`. For example:
 
 ```json
-{
+{{
   "omissions": [
-    {
+    {{
       "script_excerpt": "“Today we'll discuss our company mission in depth.”",
       "transcript_excerpt": null,
       "timestamp": "n/a",
       "note": "This line was not said during the delivery."
-    }
+    }}
   ],
   "additions": [
-    {
+    {{
       "script_excerpt": null,
       "transcript_excerpt": "“Thank you all for being here today.”",
       "timestamp": "00:00:05",
       "note": "The speaker added an opening greeting."
-    }
+    }}
   ],
   "paraphrases": [
-    {
+    {{
       "script_excerpt": "“We achieved a 20 percent growth last quarter.”",
       "transcript_excerpt": "“Our numbers jumped by about one-fifth in the last three months.”",
       "timestamp": "00:03:15",
       "note": "Idea is the same but wording differs."
-    }
+    }}
   ]
-}```
+}}```
 
 Here are the inputs:
 
@@ -136,18 +136,18 @@ For each improvement, output an object with:
   - description: what changed vs. last time and why it’s better
 
 Organize your output as a JSON object named “improvements” like this:
-{
+{{
   "improvements": [
-    {
+    {{
       "timestamp": "00:15, 00:45",
       "description": "Reduced hair-touching habit; hands now remain relaxed at sides."
-    },
-    {
+    }},
+    {{
       "timestamp": "01:10",
       "description": "Maintained steady eye contact for 3 seconds instead of looking down at notes."
-    }
+    }}
     // …
   ]
-}
+}}
 """
 
