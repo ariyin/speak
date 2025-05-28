@@ -1,5 +1,6 @@
 # app.py
 import shutil
+from typing import Optional
 import uuid
 from pathlib import Path
 from transcript_analysis import analyze_transcript
@@ -7,14 +8,10 @@ from transcript_analysis import analyze_transcript
 import os
 from dotenv import load_dotenv
 
-import os
-from dotenv import load_dotenv
-
-from fastapi import FastAPI, File, UploadFile, HTTPException, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, HttpUrl
-from typing import List, Dict
 
 import ffmpeg                  # ffmpeg-python wrapper
 import whisper                 # OpenAI Whisper local
@@ -25,8 +22,6 @@ from google.genai.types import Part, GenerateContentConfig
 import uvicorn
 import json
 import mimetypes
-from openai import OpenAI
-from openai import OpenAI
 
 app = FastAPI()
 app.add_middleware(
@@ -41,14 +36,7 @@ model = whisper.load_model("small")   # or "base", "medium", "large"
 
 from prompts import (
     video_analysis_prompt,
-    video_improvement_prompt,
-    content_analysis_prompt,
-)
-
-from prompts import (
-    video_analysis_prompt,
-    video_improvement_prompt,
-    content_analysis_prompt,
+    video_improvement_prompt
 )
 
 UPLOAD_DIR = Path("/tmp/uploads")
@@ -62,26 +50,30 @@ GEMINI_PRO_MODEL_ID = "gemini-2.0-flash"
 # load credentials from env file
 load_dotenv()
 
-# checks if URL is valid
-class VideoURLRequest(BaseModel):
-    url: HttpUrl
+# analyze request schema
+class AnalyzeRequest(BaseModel):
+    video_url: HttpUrl
+    outline: Optional[str] = None
+    script: Optional[str] = None
 
-## FILLER WORD + SPEED ANALYSIS
-# checks if URL is vali
+def get_gemini_client():
+    # Initialize the Gemini client (adjust auth if needed)
+    return genai.Client(api_key = os.environ["GEMINI_API_KEY"])#, vertexai = True, project=PROJECT_ID, location=LOCATION)
 
-## FILLER WORD + SPEED ANALYSIS
+## CONTENT ANALYSIS
 @app.post("/analyze_transcript/")
 # takes in cloudinary URL, and gets transcript along with analysis
-async def upload_video(req: VideoURLRequest):
+async def upload_video(req: AnalyzeRequest):
     # 1) Download video
+    url = str(req.video_url)
     async with httpx.AsyncClient() as client:
-        resp = await client.get(str(req.url))
+        resp = await client.get(url)
     if resp.status_code != 200:
         raise HTTPException(400, f"Failed to fetch video: {resp.status_code}")
 
     # 2) Save to temp file
     file_id = uuid.uuid4().hex
-    suffix = Path(req.url.path).suffix or ".mp4"
+    suffix = Path(req.video_url.path).suffix or ".mp4"
     video_path = UPLOAD_DIR / f"{file_id}{suffix}"
     with open(video_path, "wb") as f:
         f.write(resp.content)
@@ -107,29 +99,23 @@ async def upload_video(req: VideoURLRequest):
     except:
         pass
 
-    # 5. Get WPM and filler word count from transcript
-    delivery_analysis = analyze_transcript(result)
+    # # 5. Get WPM and filler word count from transcript
+    # delivery_analysis = analyze_transcript(result)
 
-    return JSONResponse({"transcript": transcript, "analysis": delivery_analysis})
+    # return JSONResponse({"transcript": transcript, "transcript_analysis": delivery_analysis})
+    print("Video transcript gotten")
+    analysis = analyze_transcript(
+        result,
+        outline=req.outline,
+        script=req.script,
+        transcript = transcript
+    )
 
+    return JSONResponse(analysis)
 
-# Content Analysis: Outline
-
-async def analyze_content_outline(outline: str, transcript: str):
-    """
-    Analyzes the content outline and transcript for coherence, flow, and engagement. Gives feedback to user on how
-    well what they are saying (the transcript) matches what they are trying to say (the outline).
-    """
-    prompt = content_analysis_prompt.format(outline=outline, transcript=transcript)
-
-    ## Feed into Lllama 3 here
-
+# CONTENT ANALYSIS APIS
+   
 ## BODY LANGUAGE ANALYSIS APIS
-
-
-def get_gemini_client():
-    # Initialize the Gemini client (adjust auth if needed)
-    return genai.Client(api_key = os.environ["GEMINI_API_KEY"])#, vertexai = True, project=PROJECT_ID, location=LOCATION)
 
 video_analysis_response_schema = {
         "type": "OBJECT",
@@ -187,9 +173,9 @@ json_config = GenerateContentConfig(
 # change so that this takes in a cloundinary URL, converts to a file, and then uploads to Gemini
 #https://res.cloudinary.com/drg6bi879/video/upload/v1747867042/videoplayback_vrwez9.mp4
 # ex. would take in a link like this
-async def analyze_body_language_init(req: VideoURLRequest):
+async def analyze_body_language_init(req: AnalyzeRequest):
     # Fetch the video bytes from the Cloudinary URL
-    url = str(req.url)
+    url = str(req.video_url)
     async with httpx.AsyncClient() as http_client:
         resp = await http_client.get(url)
     if resp.status_code != 200:
@@ -233,11 +219,11 @@ async def analyze_body_language_init(req: VideoURLRequest):
 # this function will compare the feedback given before and analyze what the speaker did
 # better this time
 # inputs would be the video URL and the previous feedback
-async def analyze_body_language_improvement(req: VideoURLRequest, feedback: str):
+async def analyze_body_language_improvement(req: AnalyzeRequest, feedback: str):
     prompt = video_improvement_prompt.format(feedback=feedback)
 
     # Fetch the video bytes from the Cloudinary URL
-    url = str(req.url)
+    url = str(req.video_url)
     async with httpx.AsyncClient() as http_client:
         resp = await http_client.get(url)
     if resp.status_code != 200:
