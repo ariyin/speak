@@ -4,6 +4,7 @@ import axios from "axios";
 import VideoPlayer from "../components/VideoPlayer";
 import type { CloudinaryPlayer } from "../utils/cloudinaryService";
 import type { DeliveryAnalysis } from "../utils/deliveryAnalysis";
+import type { ContentAnalysis } from "../utils/contentAnalysis";
 
 function getCloudinaryPublicId(url: string) {
   // Handle both HTTP and HTTPS URLs
@@ -70,11 +71,23 @@ function PastAnalysis() {
   const [deliveryData, setDeliveryData] = useState<DeliveryAnalysis | null>(
     null,
   );
-  const [contentData, setContentData] = useState(null);
+  const [contentData, setContentData] = useState<ContentAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const { rehearsalId } = useParams();
   const [speechId, setSpeechId] = useState("")
   const [publicId, setPublicId] = useState("");
+
+  const handleTimestampClick = (timestamp: string) => {
+    if (!playerRef.current) return;
+    try {
+      const [hours, minutes, seconds] = timestamp.split(":").map(Number);
+      const totalSeconds = (hours * 60 + minutes) * 60 + seconds;
+      // seek to the timestamp
+      playerRef.current.currentTime(totalSeconds);
+    } catch (error) {
+      console.error("Failure skipping to timestamp:", error);
+    }
+  };
 
   useEffect(() => {
     const analyze = async () => {
@@ -121,20 +134,20 @@ function PastAnalysis() {
           <VideoPlayer publicId={publicId} onReady={handleReady} />
         </div>
         <div className="space-y-4 rounded-2xl border-2 border-black p-4">
-          <h2>Delivery Analysis</h2>
-          {deliveryData?.transcript_analysis ? (
+          {deliveryData ? (
             <>
+              <h2>Delivery Analysis</h2>
               <details className="rounded-lg border p-2">
                 <summary className="cursor-pointer text-lg font-medium">
                   Filler Words
                 </summary>
                 <ul className="list-disc pl-4">
-                  {deliveryData?.transcript_analysis?.analysis?.filler_words &&
-                  Object.keys(
-                    deliveryData.transcript_analysis.analysis.filler_words,
-                  ).length > 0 ? (
+                  {deliveryData.filler_words &&
+                    Object.keys(
+                      deliveryData.filler_words
+                    ).length > 0 ? (
                     Object.entries(
-                      deliveryData.transcript_analysis.analysis.filler_words,
+                      deliveryData.filler_words
                     ).map(([word, count], idx) => (
                       <li key={idx}>
                         {" "}
@@ -152,63 +165,181 @@ function PastAnalysis() {
                   Speaking Rate
                 </summary>
                 <p className="pl-4">
-                  {deliveryData.transcript_analysis.analysis?.speech_rate_wpm ??
+                  {deliveryData.speech_rate_wpm ??
                     "N/A"}
                 </p>
               </details>
+              <details className="mb-4 rounded-lg border p-2">
+                <summary className="cursor-pointer text-lg font-medium">
+                  Body Language
+                </summary>
+
+                <details className="mt-2 ml-4 rounded-lg border p-2">
+                  <summary className="cursor-pointer font-semibold">Pros</summary>
+                  <ul className="max-h-48 list-disc overflow-y-auto pl-4">
+                    {deliveryData.body_language_analysis.pros.length > 0 ? (
+                      deliveryData.body_language_analysis.pros.map(
+                        ({ timestamp, description }, idx) => (
+                          <li key={idx}>
+                            {timestamp.split(",").map((t, i) => (
+                              <button
+                                key={i}
+                                onClick={() => handleTimestampClick(t.trim())}
+                                className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
+                                type="button"
+                              >
+                                <strong>{t.trim()}</strong>
+                              </button>
+                            ))}
+                            : {description}
+                          </li>
+                        )
+                      )
+                    ) : (
+                      <li>No pros found</li>
+                    )}
+                  </ul>
+                </details>
+
+                <details className="mt-2 ml-4 rounded-lg border p-2">
+                  <summary className="cursor-pointer font-semibold">
+                    Areas of Improvement
+                  </summary>
+                  <ul className="max-h-48 list-disc overflow-y-auto pl-4">
+                    {deliveryData.body_language_analysis.cons.length > 0 ? (
+                      deliveryData.body_language_analysis.cons.map(
+                        ({ timestamp, description }, idx) => (
+                          <li key={idx}>
+                            {timestamp.split(",").map((t, i) => (
+                              <button
+                                key={i}
+                                onClick={() => handleTimestampClick(t.trim())}
+                                className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
+                                type="button"
+                              >
+                                <strong>{t.trim()}</strong>
+                              </button>
+                            ))}
+                            : {description}
+                          </li>
+                        )
+                      )
+                    ) : (
+                      <li>No areas of improvement found, you did perfect!</li>
+                    )}
+                  </ul>
+                </details>
+              </details>
             </>
           ) : (
-            <p>No delivery analysis available.</p>
+            <p>No delivery analysis available</p>
           )}
-          {deliveryData?.body_language_analysis ? (
-            <details className="mb-4 rounded-lg border p-2">
-              <summary className="cursor-pointer text-lg font-medium">
-                Body Language
-              </summary>
+        
+          {contentData ? (
+            <>
+              <h2>Content Analysis</h2>
+              {/* Outline Analysis (Pros & Cons) */}
+              {contentData.content_analysis && (
+                <details className="rounded-lg border p-2">
+                  <summary className="cursor-pointer text-lg font-medium">
+                    Outline Feedback
+                  </summary>
 
-              <details className="mt-2 ml-4 rounded-lg border p-2">
-                <summary className="cursor-pointer font-semibold">Pros</summary>
-                <ul className="max-h-48 list-disc overflow-y-auto pl-4">
-                  {deliveryData.body_language_analysis.pros.length > 0 ? (
-                    deliveryData.body_language_analysis.pros.map(
-                      ({ timestamp, description }, idx) => (
-                        <li key={idx}>
-                          <strong>{timestamp}</strong>: {description}
-                        </li>
-                      ),
-                    )
-                  ) : (
-                    <li>No pros found</li>
-                  )}
-                </ul>
-              </details>
+                  <details className="mt-2 ml-4 rounded-lg border p-2">
+                    <summary className="cursor-pointer font-semibold">Pros</summary>
+                    <ul className="max-h-48 list-disc overflow-y-auto pl-4">
+                      {contentData.content_analysis.pros.length > 0 ? (
+                        contentData.content_analysis.pros.map((obs, idx) => (
+                          <li key={idx}>
+                            <button
+                              onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                              className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
+                              type="button"
+                            >
+                              <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
+                            </button>: <em>{obs.outline_point}</em><br />
+                            <span className="block italic text-sm">Transcript: {obs.transcript_excerpt}</span>
+                            <span className="block">Suggestion: {obs.suggestion}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li>No strengths found in outline.</li>
+                      )}
+                    </ul>
+                  </details>
 
-              <details className="mt-2 ml-4 rounded-lg border p-2">
-                <summary className="cursor-pointer font-semibold">
-                  Areas of Improvement
-                </summary>
-                <ul className="max-h-48 list-disc overflow-y-auto pl-4">
-                  {deliveryData.body_language_analysis.cons.length > 0 ? (
-                    deliveryData.body_language_analysis.cons.map(
-                      ({ timestamp, description }, idx) => (
-                        <li key={idx}>
-                          <strong>{timestamp}</strong>: {description}
-                        </li>
-                      ),
-                    )
-                  ) : (
-                    <li>No areas of improvement found, you did perfect!</li>
-                  )}
-                </ul>
-              </details>
-            </details>
+                  <details className="mt-2 ml-4 rounded-lg border p-2">
+                    <summary className="cursor-pointer font-semibold">Areas for Improvement</summary>
+                    <ul className="max-h-48 list-disc overflow-y-auto pl-4">
+                      {contentData.content_analysis.cons.length > 0 ? (
+                        contentData.content_analysis.cons.map((obs, idx) => (
+                          <li key={idx}>
+                            <button
+                              onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                              className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
+                              type="button"
+                            >
+                              <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
+                            </button>: <em>{obs.outline_point}</em><br />
+                            <span className="block italic text-sm">Issue: {obs.issue}</span>
+                            <span className="block">Suggestion: {obs.suggestion}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li>No weaknesses found in outline — great job!</li>
+                      )}
+                    </ul>
+                  </details>
+                </details>
+              )}
+
+              {/* Script Analysis (Omissions, Additions, Paraphrases) */}
+              {contentData.script_analysis && (
+                <details className="rounded-lg border p-2">
+                  <summary className="cursor-pointer text-lg font-medium">
+                    Script Feedback
+                  </summary>
+
+                  {(() => {
+                    const scriptAnalysis = contentData.script_analysis;
+                    if (!scriptAnalysis) return null;
+
+                    return (['omissions', 'additions', 'paraphrases'] as const).map((key) => (
+                      <details key={key} className="mt-2 ml-4 rounded-lg border p-2">
+                        <summary className="cursor-pointer font-semibold capitalize">{key}</summary>
+                        <ul className="max-h-48 list-disc overflow-y-auto pl-4">
+                          {scriptAnalysis[key].length > 0 ? (
+                            scriptAnalysis[key].map((obs, idx) => (
+                              <li key={idx}>
+                                <button
+                                  onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                                  className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
+                                  type="button"
+                                >
+                                  <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
+                                </button>
+                                <span className="block italic text-sm">Script: {obs.script_excerpt}</span>
+                                <span className="block italic text-sm">Transcript: {obs.transcript_excerpt}</span>
+                                <span className="block">Note: {obs.note}</span>
+                              </li>
+                            ))
+                          ) : (
+                            <li>No {key} found</li>
+                          )}
+                        </ul>
+                      </details>
+                    ));
+                  })()}
+                </details>
+              )}
+            </>
           ) : (
-            <p>No body language analysis available</p>
+            <p>No content analysis available</p>
           )}
         </div>
       </div>
       <div className="flex justify-end gap-4">
-      <NavLink to={`/speech/${speechId}/summary`}>
+        <NavLink to={`/speech/${speechId}/summary`}>
           <button>back to summary</button>
         </NavLink>
         <NavLink to={`/`}>

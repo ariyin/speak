@@ -93,6 +93,7 @@ def rehearsal_helper(rehearsal) -> dict:
         "speech": str(rehearsal["speech"]),
         "videoUrl": rehearsal["videoUrl"],
         "duration": rehearsal.get("duration"),
+        "content": rehearsal.get("content"),
         "deliveryAnalysis": rehearsal.get("deliveryAnalysis"),
         "contentAnalysis": rehearsal.get("contentAnalysis"),
         "date": rehearsal.get("date", get_today_date())

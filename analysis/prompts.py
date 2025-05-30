@@ -8,13 +8,13 @@ Your task is for **each** outline point, determine whether and how the transcrip
 
 - If the transcript **clearly covers** an outline point, add an entry to `pros`:
   • `outline_point`: the exact bullet from the outline  
-  • `timestamp`: approximate HH:MM:SS where they covered this point  
+  • `timestamp`: a single approximate HH:MM:SS where they covered this point  
   • `transcript_excerpt`: the exact phrase or short section from the transcript that addresses it  
   • `suggestion`: (optional) how to deepen or clarify this coverage
 
 - If the transcript **fails to cover** or only **briefly & weakly** covers an outline point, add an entry to `cons`:
   • `outline_point`: the exact bullet from the outline  
-  • `timestamp`: if it appears briefly, the HH:MM:SS; otherwise "missing"  
+  • `timestamp`: if it appears briefly, the single HH:MM:SS; otherwise "missing"  
   • `issue`: a brief note on why this point wasn’t fully addressed  
   • `suggestion`: how to better integrate or expand on this point
 
@@ -39,6 +39,8 @@ Return a JSON object with two arrays, `pros` and `cons`, for example:
     }}
   ]
 }}```
+
+It is very important that timestamps be in HH:MM:SS format, please follow this. It should be a single timestamp per pro or con, not a range.
 
 Here are the inputs:
 
@@ -98,6 +100,8 @@ Return a single JSON object with three arrays: `omissions`, `additions`, and `pa
   ]
 }}```
 
+It is very important that timestamps be in HH:MM:SS format, please follow this.
+
 Here are the inputs:
 
 Script:
@@ -121,7 +125,9 @@ video_analysis_prompt = (
     "  - [HH:MM:SS, HH:MM:SS, …]: Area for improvement — explain what the speaker is doing wrong and why it matters (e.g. closed gestures, shaky posture, nervous smile)\n\n"
     "Requirements:\n"
     "  1. Cover the entire video, with at least one Pro and one Con for each minute of footage.\n"
-    "  2. Every bullet must include its own timestamp(s)."
+    "  2. Every bullet must include its own timestamp(s).\n"
+
+    "It is very important that timestamps be in HH:MM:SS format, please follow this."
 )
 
 video_improvement_prompt = """
@@ -139,15 +145,17 @@ Organize your output as a JSON object named “improvements” like this:
 {{
   "improvements": [
     {{
-      "timestamp": "00:15, 00:45",
+      "timestamp": "00:00:15, 00:00:45",
       "description": "Reduced hair-touching habit; hands now remain relaxed at sides."
     }},
     {{
-      "timestamp": "01:10",
+      "timestamp": "00:01:10",
       "description": "Maintained steady eye contact for 3 seconds instead of looking down at notes."
     }}
     // …
   ]
 }}
+
+It is very important that timestamps be in HH:MM:SS format, please follow this.
 """
 

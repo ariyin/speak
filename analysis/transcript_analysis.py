@@ -140,4 +140,7 @@ def analyze_transcript(result: dict, outline: Optional[str] = None, script: Opti
         output["content_analysis"] = analyze_content_outline(outline, [[segment["start"], segment["text"]] for segment in result["segments"]])
     if script:
         output["script_analysis"] = analyze_content_script(script, [[segment["start"], segment["text"]] for segment in result["segments"]])
+    
+    print(output)
+    
     return output
