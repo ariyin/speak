@@ -72,11 +72,11 @@ export default function AnalysisContent({
             <Accordion type="multiple">
               <AccordionItem value="item-1">
                 <AccordionTrigger>pros</AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="flex flex-col gap-3">
                   {deliveryData.body_language_analysis.pros.length > 0 ? (
                     deliveryData.body_language_analysis.pros.map(
                       ({ timestamp, description }, idx) => (
-                        <li key={idx}>
+                        <div key={idx} className="font-gs">
                           {timestamp.split(",").map((t, i, arr) => (
                             <button
                               key={i}
@@ -92,21 +92,21 @@ export default function AnalysisContent({
                             </button>
                           ))}
                           : {description}
-                        </li>
+                        </div>
                       ),
                     )
                   ) : (
-                    <li>no pros found</li>
+                    <p>no pros found</p>
                   )}
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2">
                 <AccordionTrigger>areas of improvement</AccordionTrigger>
-                <AccordionContent>
+                <AccordionContent className="flex flex-col gap-3">
                   {deliveryData.body_language_analysis.cons.length > 0 ? (
                     deliveryData.body_language_analysis.cons.map(
                       ({ timestamp, description }, idx) => (
-                        <li key={idx}>
+                        <div key={idx} className="font-gs">
                           {timestamp.split(",").map((t, i, arr) => (
                             <button
                               key={i}
@@ -122,11 +122,11 @@ export default function AnalysisContent({
                             </button>
                           ))}
                           : {description}
-                        </li>
+                        </div>
                       ),
                     )
                   ) : (
-                    <li>no areas of improvement found, you did perfect!</li>
+                    <p>no areas of improvement found, you did perfect!</p>
                   )}
                 </AccordionContent>
               </AccordionItem>
@@ -149,7 +149,7 @@ export default function AnalysisContent({
                     <AccordionContent className="flex flex-col gap-3">
                       {contentData.content_analysis.pros.length > 0 ? (
                         contentData.content_analysis.pros.map((obs, idx) => (
-                          <li key={idx}>
+                          <div key={idx} className="font-gs">
                             <button
                               onClick={() =>
                                 handleTimestampClick(
@@ -164,16 +164,16 @@ export default function AnalysisContent({
                               </strong>
                             </button>
                             : {obs.outline_point}
-                            <div className="flex flex-col gap-2 pl-5">
+                            <div className="flex flex-col gap-2">
                               <p className="font-medium">
-                                "{obs.transcript_excerpt}"
+                                {obs.transcript_excerpt}
                               </p>
                               <p>{obs.suggestion}</p>
                             </div>
-                          </li>
+                          </div>
                         ))
                       ) : (
-                        <li>no strengths found in outline.</li>
+                        <p>no strengths found in outline.</p>
                       )}
                     </AccordionContent>
                   </AccordionItem>
@@ -182,7 +182,7 @@ export default function AnalysisContent({
                     <AccordionContent className="flex flex-col gap-3">
                       {contentData.content_analysis.cons.length > 0 ? (
                         contentData.content_analysis.cons.map((obs, idx) => (
-                          <li key={idx}>
+                          <div key={idx} className="font-gs">
                             <button
                               onClick={() =>
                                 handleTimestampClick(
@@ -197,14 +197,14 @@ export default function AnalysisContent({
                               </strong>
                             </button>
                             : {obs.outline_point}
-                            <div className="flex flex-col gap-2 pl-5">
+                            <div className="flex flex-col gap-2">
                               <p className="font-medium">{obs.issue}</p>
                               <p>{obs.suggestion}</p>
                             </div>
-                          </li>
+                          </div>
                         ))
                       ) : (
-                        <li>no weaknesses found in outline — great job!</li>
+                        <p>no weaknesses found in outline — great job!</p>
                       )}
                     </AccordionContent>
                   </AccordionItem>
@@ -234,7 +234,7 @@ export default function AnalysisContent({
                         <AccordionContent className="flex flex-col gap-3">
                           {scriptAnalysis[key].length > 0 ? (
                             scriptAnalysis[key].map((obs: any, idx: number) => (
-                              <li key={idx}>
+                              <div key={idx} className="font-gs">
                                 <button
                                   onClick={() =>
                                     handleTimestampClick(
@@ -248,26 +248,26 @@ export default function AnalysisContent({
                                     {obs.timestamp.trim().replace(/\./g, ":")}
                                   </strong>
                                 </button>
-                                <div className="flex flex-col gap-2 pl-5">
+                                <div className="flex flex-col gap-2">
                                   <p>
-                                    <span className="font-medium">script</span>:
-                                    "{obs.script_excerpt}"
+                                    <span className="font-medium">script</span>:{" "}
+                                    {obs.script_excerpt}
                                   </p>
                                   <p>
                                     <span className="font-medium">
                                       transcript
                                     </span>
-                                    : "{obs.transcript_excerpt}"
+                                    : {obs.transcript_excerpt}
                                   </p>
                                   <p>
                                     <span className="font-medium">note</span>:{" "}
                                     {obs.note}
                                   </p>
                                 </div>
-                              </li>
+                              </div>
                             ))
                           ) : (
-                            <li>no {key} found</li>
+                            <p>no {key} found</p>
                           )}
                         </AccordionContent>
                       </AccordionItem>

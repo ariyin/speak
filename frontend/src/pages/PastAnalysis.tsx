@@ -4,6 +4,7 @@ import axios from "axios";
 import AnalysisContent from "../components/AnalysisContent";
 import type { DeliveryAnalysis } from "../utils/deliveryAnalysis";
 import type { ContentAnalysis } from "../utils/contentAnalysis";
+import { deleteCurrentRehearsal } from "@/utils/auth";
 
 function getCloudinaryPublicId(url: string) {
   // Handle both HTTP and HTTPS URLs
@@ -112,7 +113,11 @@ function PastAnalysis() {
 
   return (
     <div className="grid h-screen grid-rows-[auto_1fr] gap-y-8 p-8">
-      <NavLink to={`/speech/${speechId}/summary`} className="justify-self-end">
+      <NavLink
+        to={`/speech/${speechId}/summary`}
+        onClick={() => deleteCurrentRehearsal()}
+        className="justify-self-end"
+      >
         <button>back to summary</button>
       </NavLink>
       <AnalysisContent

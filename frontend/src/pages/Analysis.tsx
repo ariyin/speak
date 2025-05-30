@@ -164,7 +164,7 @@ function Analysis() {
 
   if (loading)
     return (
-      <div className="flex h-full items-center justify-center text-center text-gray-400">
+      <div className="flex h-screen items-center justify-center text-center text-gray-400">
         <h2>analyzing video...</h2>
       </div>
     );
