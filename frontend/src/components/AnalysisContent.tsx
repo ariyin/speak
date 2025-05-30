@@ -26,8 +26,8 @@ export default function AnalysisContent({
   const handleTimestampClick = (timestamp: string) => {
     if (!playerRef.current) return;
     try {
-      const [hours, minutes, seconds] = timestamp.split(":").map(Number);
-      const totalSeconds = (hours * 60 + minutes) * 60 + seconds;
+      const [minutes, seconds] = timestamp.split(":").map(Number);
+      const totalSeconds = minutes * 60 + seconds;
       // seek to the timestamp
       playerRef.current.currentTime(totalSeconds);
     } catch (error) {
