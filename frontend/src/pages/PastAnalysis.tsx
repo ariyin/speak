@@ -76,7 +76,7 @@ function PastAnalysis() {
   const [contentData, setContentData] = useState<ContentAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const { rehearsalId } = useParams();
-  const [speechId, setSpeechId] = useState("mock-speech-id");
+  const [speechId, setSpeechId] = useState("");
   const [publicId, setPublicId] = useState("");
 
   useEffect(() => {
