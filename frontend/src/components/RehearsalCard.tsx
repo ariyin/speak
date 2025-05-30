@@ -10,7 +10,7 @@ function RehearsalCard({ rehearsal }: RehearsalCardProps) {
 
   return (
     <NavLink
-      to={`/rehearsal/${rehearsal.id}/past_analysis`}
+      to={`/rehearsal/${rehearsal.id}/saved`}
       className="flex flex-col gap-4 rounded-lg"
     >
       <div className="aspect-video rounded bg-gray-200">

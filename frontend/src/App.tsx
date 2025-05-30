@@ -72,7 +72,7 @@ function App() {
           }
         />
         <Route
-          path="/rehearsal/:rehearsalId/past_analysis"
+          path="/rehearsal/:rehearsalId/saved"
           element={
             <ProtectedRoute>
               <PastAnalysis />

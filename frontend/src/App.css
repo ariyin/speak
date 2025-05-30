@@ -43,8 +43,16 @@
     @apply font-manrope text-xl font-bold;
   }
 
+  h4 {
+    @apply font-manrope text-lg font-medium;
+  }
+
   p {
     @apply font-gs;
+  }
+
+  li {
+    @apply font-gs pl-5;
   }
 
   button {
@@ -96,4 +104,8 @@ video {
 
 video::-webkit-media-controls-enclosure {
   transform: scaleX(-1);
+}
+
+.timestamp {
+  @apply text-cherry border-0 bg-transparent p-0 hover:underline;
 }

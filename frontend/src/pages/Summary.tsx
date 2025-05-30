@@ -63,7 +63,7 @@ function Summary() {
           <button>back to home</button>
         </NavLink>
         <div className="flex h-full items-center justify-center">
-          <p className="text-gray-400">loading...</p>
+          <h2 className="text-gray-400">loading...</h2>
         </div>
       </div>
     );
