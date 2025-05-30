@@ -98,14 +98,6 @@
   @apply absolute top-0 left-0 h-full w-full;
 }
 
-video {
-  transform: scaleX(-1);
-}
-
-video::-webkit-media-controls-enclosure {
-  transform: scaleX(-1);
-}
-
 .timestamp {
   @apply text-cherry border-0 bg-transparent p-0 hover:underline;
 }

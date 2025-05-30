@@ -2,7 +2,19 @@ export interface CloudinaryPlayer {
   duration(): number;
   currentTime(time: number): void;
   dispose(): void;
-  seek(time: number): void;
+  play(): void;
+  source(
+    publicId: string,
+    options?: {
+      transformation?: {
+        height?: number;
+        width?: number;
+        crop?: string;
+        gravity?: string;
+      };
+      sourceTypes?: string[];
+    },
+  ): void;
 }
 
 export async function uploadFileToCloudinary(

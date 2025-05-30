@@ -142,7 +142,7 @@ function Analysis() {
     };
 
     if (secureUrl) analyze();
-  }, [secureUrl, rehearsalId]);
+  }, [secureUrl]);
 
   const handleRehearseAgain = async () => {
     try {
