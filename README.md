@@ -48,6 +48,12 @@ create a `.env` file in `/analysis` with the following:
 GEMINI_API_KEY=
 ```
 
+Download [ollama](https://ollama.com/download)
+
+Run `ollama pull llama3`
+
+Run `ollama run llama3`
+
 ## usage
 
 ### overall flow
