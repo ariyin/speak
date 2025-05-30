@@ -9,60 +9,63 @@ import type { ContentAnalysis } from "../utils/contentAnalysis";
 function getCloudinaryPublicId(url: string) {
   // Handle both HTTP and HTTPS URLs
   const urlObj = new URL(url);
-  
+
   // Extract the pathname (everything after the domain)
   const pathname = urlObj.pathname;
-  
+
   // Split the path by '/' and filter out empty strings
-  const pathParts = pathname.split('/').filter(part => part !== '');
-  
+  const pathParts = pathname.split("/").filter((part) => part !== "");
+
   // Find the index of the resource type (video, image, etc.)
-  const resourceTypeIndex = pathParts.findIndex(part => 
-    ['video', 'image', 'raw', 'auto'].includes(part)
+  const resourceTypeIndex = pathParts.findIndex((part) =>
+    ["video", "image", "raw", "auto"].includes(part),
   );
-  
+
   if (resourceTypeIndex === -1) {
-    throw new Error('Invalid Cloudinary URL: resource type not found');
+    throw new Error("Invalid Cloudinary URL: resource type not found");
   }
-  
+
   // The public ID starts after the upload type (usually 'upload')
   // Typical structure: /[cloud_name]/[resource_type]/[upload_type]/[transformations]/[public_id].[format]
   const uploadTypeIndex = resourceTypeIndex + 1;
-  
+
   if (uploadTypeIndex >= pathParts.length) {
-    throw new Error('Invalid Cloudinary URL: upload type not found');
+    throw new Error("Invalid Cloudinary URL: upload type not found");
   }
-  
+
   // Find where the public ID starts (after upload type and any transformations)
   let publicIdStartIndex = uploadTypeIndex + 1;
-  
+
   // Skip transformation parameters (they contain commas, underscores, or specific transformation syntax)
   while (publicIdStartIndex < pathParts.length) {
     const part = pathParts[publicIdStartIndex];
     // If the part contains transformation syntax, skip it
-    if (part.includes(',') || part.includes('_') && part.split('_').length > 2) {
+    if (
+      part.includes(",") ||
+      (part.includes("_") && part.split("_").length > 2)
+    ) {
       publicIdStartIndex++;
     } else {
       break;
     }
   }
-  
+
   if (publicIdStartIndex >= pathParts.length) {
-    throw new Error('Invalid Cloudinary URL: public ID not found');
+    throw new Error("Invalid Cloudinary URL: public ID not found");
   }
-  
+
   // Get all remaining parts (public ID can contain folders, separated by '/')
   const publicIdParts = pathParts.slice(publicIdStartIndex);
-  
+
   // Join the parts and remove the file extension from the last part
-  let publicId = publicIdParts.join('/');
-  
+  let publicId = publicIdParts.join("/");
+
   // Remove file extension (everything after the last dot)
-  const lastDotIndex = publicId.lastIndexOf('.');
+  const lastDotIndex = publicId.lastIndexOf(".");
   if (lastDotIndex !== -1) {
     publicId = publicId.substring(0, lastDotIndex);
   }
-  
+
   return publicId;
 }
 
@@ -74,14 +77,14 @@ function PastAnalysis() {
   const [contentData, setContentData] = useState<ContentAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const { rehearsalId } = useParams();
-  const [speechId, setSpeechId] = useState("")
+  const [speechId, setSpeechId] = useState("");
   const [publicId, setPublicId] = useState("");
 
   const handleTimestampClick = (timestamp: string) => {
     if (!playerRef.current) return;
     try {
-      const [hours, minutes, seconds] = timestamp.split(":").map(Number);
-      const totalSeconds = (hours * 60 + minutes) * 60 + seconds;
+      const [minutes, seconds] = timestamp.split(":").map(Number);
+      const totalSeconds = minutes * 60 + seconds;
       // seek to the timestamp
       playerRef.current.currentTime(totalSeconds);
     } catch (error) {
@@ -143,17 +146,15 @@ function PastAnalysis() {
                 </summary>
                 <ul className="list-disc pl-4">
                   {deliveryData.filler_words &&
-                    Object.keys(
-                      deliveryData.filler_words
-                    ).length > 0 ? (
-                    Object.entries(
-                      deliveryData.filler_words
-                    ).map(([word, count], idx) => (
-                      <li key={idx}>
-                        {" "}
-                        {word}: {count}{" "}
-                      </li>
-                    ))
+                  Object.keys(deliveryData.filler_words).length > 0 ? (
+                    Object.entries(deliveryData.filler_words).map(
+                      ([word, count], idx) => (
+                        <li key={idx}>
+                          {" "}
+                          {word}: {count}{" "}
+                        </li>
+                      ),
+                    )
                   ) : (
                     <li>None found</li>
                   )}
@@ -164,10 +165,7 @@ function PastAnalysis() {
                 <summary className="cursor-pointer text-lg font-medium">
                   Speaking Rate
                 </summary>
-                <p className="pl-4">
-                  {deliveryData.speech_rate_wpm ??
-                    "N/A"}
-                </p>
+                <p className="pl-4">{deliveryData.speech_rate_wpm ?? "N/A"}</p>
               </details>
               <details className="mb-4 rounded-lg border p-2">
                 <summary className="cursor-pointer text-lg font-medium">
@@ -175,7 +173,9 @@ function PastAnalysis() {
                 </summary>
 
                 <details className="mt-2 ml-4 rounded-lg border p-2">
-                  <summary className="cursor-pointer font-semibold">Pros</summary>
+                  <summary className="cursor-pointer font-semibold">
+                    Pros
+                  </summary>
                   <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                     {deliveryData.body_language_analysis.pros.length > 0 ? (
                       deliveryData.body_language_analysis.pros.map(
@@ -193,7 +193,7 @@ function PastAnalysis() {
                             ))}
                             : {description}
                           </li>
-                        )
+                        ),
                       )
                     ) : (
                       <li>No pros found</li>
@@ -222,7 +222,7 @@ function PastAnalysis() {
                             ))}
                             : {description}
                           </li>
-                        )
+                        ),
                       )
                     ) : (
                       <li>No areas of improvement found, you did perfect!</li>
@@ -234,7 +234,7 @@ function PastAnalysis() {
           ) : (
             <p>No delivery analysis available</p>
           )}
-        
+
           {contentData ? (
             <>
               <h2>Content Analysis</h2>
@@ -246,20 +246,34 @@ function PastAnalysis() {
                   </summary>
 
                   <details className="mt-2 ml-4 rounded-lg border p-2">
-                    <summary className="cursor-pointer font-semibold">Pros</summary>
+                    <summary className="cursor-pointer font-semibold">
+                      Pros
+                    </summary>
                     <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                       {contentData.content_analysis.pros.length > 0 ? (
                         contentData.content_analysis.pros.map((obs, idx) => (
                           <li key={idx}>
                             <button
-                              onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                              onClick={() =>
+                                handleTimestampClick(
+                                  obs.timestamp.trim().replace(/\./g, ":"),
+                                )
+                              }
                               className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
                               type="button"
                             >
-                              <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
-                            </button>: <em>{obs.outline_point}</em><br />
-                            <span className="block italic text-sm">Transcript: {obs.transcript_excerpt}</span>
-                            <span className="block">Suggestion: {obs.suggestion}</span>
+                              <strong>
+                                {obs.timestamp.trim().replace(/\./g, ":")}
+                              </strong>
+                            </button>
+                            : <em>{obs.outline_point}</em>
+                            <br />
+                            <span className="block text-sm italic">
+                              Transcript: {obs.transcript_excerpt}
+                            </span>
+                            <span className="block">
+                              Suggestion: {obs.suggestion}
+                            </span>
                           </li>
                         ))
                       ) : (
@@ -269,20 +283,34 @@ function PastAnalysis() {
                   </details>
 
                   <details className="mt-2 ml-4 rounded-lg border p-2">
-                    <summary className="cursor-pointer font-semibold">Areas for Improvement</summary>
+                    <summary className="cursor-pointer font-semibold">
+                      Areas for Improvement
+                    </summary>
                     <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                       {contentData.content_analysis.cons.length > 0 ? (
                         contentData.content_analysis.cons.map((obs, idx) => (
                           <li key={idx}>
                             <button
-                              onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                              onClick={() =>
+                                handleTimestampClick(
+                                  obs.timestamp.trim().replace(/\./g, ":"),
+                                )
+                              }
                               className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
                               type="button"
                             >
-                              <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
-                            </button>: <em>{obs.outline_point}</em><br />
-                            <span className="block italic text-sm">Issue: {obs.issue}</span>
-                            <span className="block">Suggestion: {obs.suggestion}</span>
+                              <strong>
+                                {obs.timestamp.trim().replace(/\./g, ":")}
+                              </strong>
+                            </button>
+                            : <em>{obs.outline_point}</em>
+                            <br />
+                            <span className="block text-sm italic">
+                              Issue: {obs.issue}
+                            </span>
+                            <span className="block">
+                              Suggestion: {obs.suggestion}
+                            </span>
                           </li>
                         ))
                       ) : (
@@ -304,22 +332,39 @@ function PastAnalysis() {
                     const scriptAnalysis = contentData.script_analysis;
                     if (!scriptAnalysis) return null;
 
-                    return (['omissions', 'additions', 'paraphrases'] as const).map((key) => (
-                      <details key={key} className="mt-2 ml-4 rounded-lg border p-2">
-                        <summary className="cursor-pointer font-semibold capitalize">{key}</summary>
+                    return (
+                      ["omissions", "additions", "paraphrases"] as const
+                    ).map((key) => (
+                      <details
+                        key={key}
+                        className="mt-2 ml-4 rounded-lg border p-2"
+                      >
+                        <summary className="cursor-pointer font-semibold capitalize">
+                          {key}
+                        </summary>
                         <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                           {scriptAnalysis[key].length > 0 ? (
                             scriptAnalysis[key].map((obs, idx) => (
                               <li key={idx}>
                                 <button
-                                  onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                                  onClick={() =>
+                                    handleTimestampClick(
+                                      obs.timestamp.trim().replace(/\./g, ":"),
+                                    )
+                                  }
                                   className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
                                   type="button"
                                 >
-                                  <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
+                                  <strong>
+                                    {obs.timestamp.trim().replace(/\./g, ":")}
+                                  </strong>
                                 </button>
-                                <span className="block italic text-sm">Script: {obs.script_excerpt}</span>
-                                <span className="block italic text-sm">Transcript: {obs.transcript_excerpt}</span>
+                                <span className="block text-sm italic">
+                                  Script: {obs.script_excerpt}
+                                </span>
+                                <span className="block text-sm italic">
+                                  Transcript: {obs.transcript_excerpt}
+                                </span>
                                 <span className="block">Note: {obs.note}</span>
                               </li>
                             ))

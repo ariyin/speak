@@ -29,7 +29,14 @@ const VideoPlayer = ({ publicId, onReady }: VideoPlayerProps) => {
         secure: true,
       });
 
-      player.source(publicId);
+      player.source(publicId, {
+        transformation: {
+          height: 360,
+          width: 640,
+          crop: "fill",
+          quality: "auto",
+        },
+      });
       playerRef.current = player;
       onReady?.(player); // <-- callback used here
     });
