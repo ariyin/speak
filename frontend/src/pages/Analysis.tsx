@@ -23,8 +23,8 @@ function Analysis() {
   const handleTimestampClick = (timestamp: string) => {
     if (!playerRef.current) return;
     try {
-      const [hours, minutes, seconds] = timestamp.split(":").map(Number);
-      const totalSeconds = (hours * 60 + minutes) * 60 + seconds;
+      const [minutes, seconds] = timestamp.split(":").map(Number);
+      const totalSeconds = minutes * 60 + seconds;
       // seek to the timestamp
       playerRef.current.currentTime(totalSeconds);
     } catch (error) {
@@ -52,20 +52,20 @@ function Analysis() {
           setContentData(contentAnalysis);
         }
 
-         // Check if all wanted data got loaded
-        if ((deliveryAnalysis || !analysisType.includes("delivery")) && 
-            (contentAnalysis  || !analysisType.includes("content")))
-        {
+        // Check if all wanted data got loaded
+        if (
+          (deliveryAnalysis || !analysisType.includes("delivery")) &&
+          (contentAnalysis || !analysisType.includes("content"))
+        ) {
           console.log("Loaded existing analysis!");
           return; // Exit early to avoid updates if already analyzed
         }
 
-        
         // Need to get analysis for the first time
 
         // Analyze transcript
-        let post_body: Record<string, any>= {};
-        post_body["video_url"] = secureUrl ;
+        let post_body: Record<string, any> = {};
+        post_body["video_url"] = secureUrl;
         if (content && content.type === "outline") {
           post_body["outline"] = content.text;
         }
@@ -75,7 +75,7 @@ function Analysis() {
 
         const t_response = await axios.post(
           "http://localhost:9000/analyze_transcript/",
-          post_body
+          post_body,
         );
 
         if (t_response.status !== 200) {
@@ -90,11 +90,12 @@ function Analysis() {
 
         deliveryAnalysis["speech_rate_wpm"] = t_response.data.speech_rate_wpm;
         deliveryAnalysis["filler_words"] = t_response.data.filler_words;
-        if ('content_analysis' in t_response.data) {
-          contentAnalysis['content_analysis'] = t_response.data.content_analysis;
+        if ("content_analysis" in t_response.data) {
+          contentAnalysis["content_analysis"] =
+            t_response.data.content_analysis;
         }
-        if ('script_analysis' in t_response.data) {
-          contentAnalysis['script_analysis'] = t_response.data.script_analysis;
+        if ("script_analysis" in t_response.data) {
+          contentAnalysis["script_analysis"] = t_response.data.script_analysis;
         }
 
         // Analyze body language if needed
@@ -113,9 +114,8 @@ function Analysis() {
           deliveryAnalysis["body_language_analysis"] = b_response.data;
         }
 
-
         // Update rehearsal with analysis data
-        if(analysisType.includes("delivery")) {
+        if (analysisType.includes("delivery")) {
           setDeliveryData(deliveryAnalysis);
 
           const d_update_response = await axios.patch(
@@ -132,13 +132,13 @@ function Analysis() {
           }
         }
 
-        if(analysisType.includes("content")) {
+        if (analysisType.includes("content")) {
           setContentData(contentAnalysis);
 
           const c_update_response = await axios.patch(
             `http://localhost:8000/rehearsal/content_analysis/${rehearsalId}`,
             {
-             contentAnalysis: contentAnalysis,
+              contentAnalysis: contentAnalysis,
             },
           );
 
@@ -207,17 +207,15 @@ function Analysis() {
                 </summary>
                 <ul className="list-disc pl-4">
                   {deliveryData.filler_words &&
-                    Object.keys(
-                      deliveryData.filler_words
-                    ).length > 0 ? (
-                    Object.entries(
-                      deliveryData.filler_words
-                    ).map(([word, count], idx) => (
-                      <li key={idx}>
-                        {" "}
-                        {word}: {count}{" "}
-                      </li>
-                    ))
+                  Object.keys(deliveryData.filler_words).length > 0 ? (
+                    Object.entries(deliveryData.filler_words).map(
+                      ([word, count], idx) => (
+                        <li key={idx}>
+                          {" "}
+                          {word}: {count}{" "}
+                        </li>
+                      ),
+                    )
                   ) : (
                     <li>None found</li>
                   )}
@@ -228,10 +226,7 @@ function Analysis() {
                 <summary className="cursor-pointer text-lg font-medium">
                   Speaking Rate
                 </summary>
-                <p className="pl-4">
-                  {deliveryData.speech_rate_wpm ??
-                    "N/A"}
-                </p>
+                <p className="pl-4">{deliveryData.speech_rate_wpm ?? "N/A"}</p>
               </details>
               <details className="mb-4 rounded-lg border p-2">
                 <summary className="cursor-pointer text-lg font-medium">
@@ -239,7 +234,9 @@ function Analysis() {
                 </summary>
 
                 <details className="mt-2 ml-4 rounded-lg border p-2">
-                  <summary className="cursor-pointer font-semibold">Pros</summary>
+                  <summary className="cursor-pointer font-semibold">
+                    Pros
+                  </summary>
                   <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                     {deliveryData.body_language_analysis.pros.length > 0 ? (
                       deliveryData.body_language_analysis.pros.map(
@@ -257,7 +254,7 @@ function Analysis() {
                             ))}
                             : {description}
                           </li>
-                        )
+                        ),
                       )
                     ) : (
                       <li>No pros found</li>
@@ -286,7 +283,7 @@ function Analysis() {
                             ))}
                             : {description}
                           </li>
-                        )
+                        ),
                       )
                     ) : (
                       <li>No areas of improvement found, you did perfect!</li>
@@ -298,7 +295,7 @@ function Analysis() {
           ) : (
             <p>No delivery analysis available</p>
           )}
-        
+
           {contentData ? (
             <>
               <h2>Content Analysis</h2>
@@ -310,20 +307,34 @@ function Analysis() {
                   </summary>
 
                   <details className="mt-2 ml-4 rounded-lg border p-2">
-                    <summary className="cursor-pointer font-semibold">Pros</summary>
+                    <summary className="cursor-pointer font-semibold">
+                      Pros
+                    </summary>
                     <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                       {contentData.content_analysis.pros.length > 0 ? (
                         contentData.content_analysis.pros.map((obs, idx) => (
                           <li key={idx}>
                             <button
-                              onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                              onClick={() =>
+                                handleTimestampClick(
+                                  obs.timestamp.trim().replace(/\./g, ":"),
+                                )
+                              }
                               className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
                               type="button"
                             >
-                              <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
-                            </button>: <em>{obs.outline_point}</em><br />
-                            <span className="block italic text-sm">Transcript: {obs.transcript_excerpt}</span>
-                            <span className="block">Suggestion: {obs.suggestion}</span>
+                              <strong>
+                                {obs.timestamp.trim().replace(/\./g, ":")}
+                              </strong>
+                            </button>
+                            : <em>{obs.outline_point}</em>
+                            <br />
+                            <span className="block text-sm italic">
+                              Transcript: {obs.transcript_excerpt}
+                            </span>
+                            <span className="block">
+                              Suggestion: {obs.suggestion}
+                            </span>
                           </li>
                         ))
                       ) : (
@@ -333,20 +344,34 @@ function Analysis() {
                   </details>
 
                   <details className="mt-2 ml-4 rounded-lg border p-2">
-                    <summary className="cursor-pointer font-semibold">Areas for Improvement</summary>
+                    <summary className="cursor-pointer font-semibold">
+                      Areas for Improvement
+                    </summary>
                     <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                       {contentData.content_analysis.cons.length > 0 ? (
                         contentData.content_analysis.cons.map((obs, idx) => (
                           <li key={idx}>
                             <button
-                              onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                              onClick={() =>
+                                handleTimestampClick(
+                                  obs.timestamp.trim().replace(/\./g, ":"),
+                                )
+                              }
                               className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
                               type="button"
                             >
-                              <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
-                            </button>: <em>{obs.outline_point}</em><br />
-                            <span className="block italic text-sm">Issue: {obs.issue}</span>
-                            <span className="block">Suggestion: {obs.suggestion}</span>
+                              <strong>
+                                {obs.timestamp.trim().replace(/\./g, ":")}
+                              </strong>
+                            </button>
+                            : <em>{obs.outline_point}</em>
+                            <br />
+                            <span className="block text-sm italic">
+                              Issue: {obs.issue}
+                            </span>
+                            <span className="block">
+                              Suggestion: {obs.suggestion}
+                            </span>
                           </li>
                         ))
                       ) : (
@@ -368,22 +393,39 @@ function Analysis() {
                     const scriptAnalysis = contentData.script_analysis;
                     if (!scriptAnalysis) return null;
 
-                    return (['omissions', 'additions', 'paraphrases'] as const).map((key) => (
-                      <details key={key} className="mt-2 ml-4 rounded-lg border p-2">
-                        <summary className="cursor-pointer font-semibold capitalize">{key}</summary>
+                    return (
+                      ["omissions", "additions", "paraphrases"] as const
+                    ).map((key) => (
+                      <details
+                        key={key}
+                        className="mt-2 ml-4 rounded-lg border p-2"
+                      >
+                        <summary className="cursor-pointer font-semibold capitalize">
+                          {key}
+                        </summary>
                         <ul className="max-h-48 list-disc overflow-y-auto pl-4">
                           {scriptAnalysis[key].length > 0 ? (
                             scriptAnalysis[key].map((obs, idx) => (
                               <li key={idx}>
                                 <button
-                                  onClick={() => handleTimestampClick(obs.timestamp.trim().replace(/\./g, ":"))}
+                                  onClick={() =>
+                                    handleTimestampClick(
+                                      obs.timestamp.trim().replace(/\./g, ":"),
+                                    )
+                                  }
                                   className="mx-1 border-0 bg-transparent p-0 text-blue-600 shadow-none hover:underline"
                                   type="button"
                                 >
-                                  <strong>{obs.timestamp.trim().replace(/\./g, ":")}</strong>
+                                  <strong>
+                                    {obs.timestamp.trim().replace(/\./g, ":")}
+                                  </strong>
                                 </button>
-                                <span className="block italic text-sm">Script: {obs.script_excerpt}</span>
-                                <span className="block italic text-sm">Transcript: {obs.transcript_excerpt}</span>
+                                <span className="block text-sm italic">
+                                  Script: {obs.script_excerpt}
+                                </span>
+                                <span className="block text-sm italic">
+                                  Transcript: {obs.transcript_excerpt}
+                                </span>
                                 <span className="block">Note: {obs.note}</span>
                               </li>
                             ))
