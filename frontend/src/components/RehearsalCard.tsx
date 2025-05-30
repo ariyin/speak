@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import type { Rehearsal } from "../utils/rehearsalService";
+import { addRehearsal } from "../utils/auth";
 
 interface RehearsalCardProps {
   rehearsal: Rehearsal;
@@ -10,7 +11,8 @@ function RehearsalCard({ rehearsal }: RehearsalCardProps) {
 
   return (
     <NavLink
-      to={`/rehearsal/${rehearsal.id}/past_analysis`}
+      to={`/rehearsal/${rehearsal.id}/saved`}
+      onClick={() => addRehearsal(rehearsal.id)}
       className="flex flex-col gap-4 rounded-lg"
     >
       <div className="aspect-video rounded bg-gray-200">

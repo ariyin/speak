@@ -51,6 +51,7 @@ const VideoPlayer = ({ publicId, onReady }: VideoPlayerProps) => {
     <video
       id="my-video"
       className="cld-video-player cld-video-player-skin-dark"
+      style={{ width: "100%", height: "100%" }}
       controls
       muted
     />

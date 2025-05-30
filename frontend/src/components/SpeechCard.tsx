@@ -78,7 +78,7 @@ function SpeechCard({
             <img
               src={speech.thumbnailUrl}
               alt="speech thumbnail"
-              className="h-full w-full object-cover"
+              className="aspect-video h-full w-full object-cover"
             />
           ) : (
             <p className="flex h-full w-full items-center justify-center text-gray-400">
