@@ -4,11 +4,11 @@ import cloudinary from "cloudinary-video-player";
 import "cloudinary-video-player/cld-video-player.min.css";
 
 interface VideoPlayerProps {
-  publicId: string;
+  url: string;
   onReady?: (player: CloudinaryPlayer) => void;
 }
 
-const VideoPlayer = ({ publicId, onReady }: VideoPlayerProps) => {
+const VideoPlayer = ({ url, onReady }: VideoPlayerProps) => {
   const playerRef = useRef<CloudinaryPlayer | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -29,7 +29,7 @@ const VideoPlayer = ({ publicId, onReady }: VideoPlayerProps) => {
         secure: true,
       });
 
-      player.source(publicId, {
+      player.source(url, {
         transformation: {
           height: 360,
           width: 640,
@@ -45,15 +45,15 @@ const VideoPlayer = ({ publicId, onReady }: VideoPlayerProps) => {
       cancelAnimationFrame(handle);
       playerRef.current?.dispose?.();
     };
-  }, [mounted, onReady]);
+  }, [mounted, onReady, url]);
 
   return (
     <video
       id="my-video"
       className="cld-video-player cld-video-player-skin-dark"
-      style={{ width: "100%", height: "100%" }}
       controls
       muted
+      style={{ width: "640px", height: "360px" }}
     />
   );
 };

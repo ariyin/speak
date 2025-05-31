@@ -55,10 +55,10 @@ function Video() {
     } catch (error) {
       console.error("Error updating rehearsal video url:", error);
     }
-
+    const fileExtension = videoFile?.name.split(".").pop();
     // navigate or pass along publicId
     navigate(`/rehearsal/${rehearsalId}/analysis`, {
-      state: { publicId, secureUrl },
+      state: { publicId, secureUrl, fileExtension },
     });
   };
 
