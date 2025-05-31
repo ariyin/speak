@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import ExitButton from "../components/ExitButton";
@@ -16,6 +16,21 @@ function Content() {
   );
   const navigate = useNavigate();
   const { rehearsalId } = useParams();
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/rehearsal/${rehearsalId}`,
+        );
+        setContent(response.data.content.text);
+        setContentType(response.data.content.type);
+      } catch (error) {
+        console.error("Failed to fetch content:", error);
+      }
+    };
+    fetchContent();
+  }, []);
 
   const handleNext = async () => {
     if (!content || !contentType) return;
