@@ -43,8 +43,17 @@ function Video() {
 
   const handleNext = async () => {
     if (!videoFile) return;
-    const { secureUrl, publicId, duration } =
-      await uploadFileToCloudinary(videoFile);
+
+    // Disable button and show uploading state
+    const button = document.querySelector(
+      ".flex.justify-between > button:last-of-type",
+    ) as HTMLButtonElement;
+    if (button) {
+      button.disabled = true;
+      button.textContent = "uploading...";
+    }
+
+    const { secureUrl, duration } = await uploadFileToCloudinary(videoFile);
 
     // Update rehearsal with link for preview
     try {
@@ -55,10 +64,10 @@ function Video() {
     } catch (error) {
       console.error("Error updating rehearsal video url:", error);
     }
-    const fileExtension = videoFile?.name.split(".").pop();
-    // navigate or pass along publicId
+
+    // navigate or pass along url
     navigate(`/rehearsal/${rehearsalId}/analysis`, {
-      state: { publicId, secureUrl, fileExtension },
+      state: { secureUrl },
     });
   };
 
