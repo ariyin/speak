@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/accordion";
 
 interface AnalysisContentProps {
-  publicId: string;
+  url: string;
   deliveryData: DeliveryAnalysis | null;
   contentData: ContentAnalysis | null;
 }
 
 export default function AnalysisContent({
-  publicId,
+  url,
   deliveryData,
   contentData,
 }: AnalysisContentProps) {
@@ -30,6 +30,7 @@ export default function AnalysisContent({
       const totalSeconds = minutes * 60 + seconds;
       // seek to the timestamp
       playerRef.current.currentTime(totalSeconds);
+      playerRef.current.play();
     } catch (error) {
       console.error("Failure skipping to timestamp:", error);
     }
@@ -42,7 +43,7 @@ export default function AnalysisContent({
   return (
     <div className="grid h-full grid-cols-2 gap-10">
       <div className="flex aspect-video items-center justify-center">
-        <VideoPlayer publicId={publicId} onReady={handleReady} />
+        <VideoPlayer url={url} onReady={handleReady} />
       </div>
       <div className="h-[calc(100vh-8rem)] space-y-4 overflow-y-scroll">
         {deliveryData ? (

@@ -15,7 +15,6 @@ function Analysis() {
   const { rehearsalId } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
-  const publicId = state?.publicId;
   const secureUrl = state?.secureUrl;
 
   useEffect(() => {
@@ -50,7 +49,7 @@ function Analysis() {
         // Need to get analysis for the first time
 
         // Analyze transcript
-        let post_body: Record<string, any> = {};
+        const post_body: Record<string, any> = {};
         post_body["video_url"] = secureUrl;
         if (content && content.type === "outline") {
           post_body["outline"] = content.text;
@@ -178,7 +177,7 @@ function Analysis() {
         <button>finish</button>
       </NavLink>
       <AnalysisContent
-        publicId={publicId}
+        url={secureUrl}
         deliveryData={deliveryData}
         contentData={contentData}
       />
