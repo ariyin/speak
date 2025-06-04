@@ -12,12 +12,14 @@ import {
 
 interface AnalysisContentProps {
   url: string;
+  content: string | null;
   deliveryData: DeliveryAnalysis | null;
   contentData: ContentAnalysis | null;
 }
 
 export default function AnalysisContent({
   url,
+  content,
   deliveryData,
   contentData,
 }: AnalysisContentProps) {
@@ -42,8 +44,18 @@ export default function AnalysisContent({
 
   return (
     <div className="grid h-full grid-cols-2 gap-10">
-      <div className="flex aspect-video items-center justify-center">
-        <VideoPlayer url={url} onReady={handleReady} />
+      <div className="flex flex-col items-center">
+        <div className="w-full aspect-video">
+          <VideoPlayer url={url} onReady={handleReady} />
+        </div>
+
+        {content && (
+          <div className="w-full max-h-[50vh] mt-4 p-4 overflow-y-auto bg-white border-t border-gray-200 shadow-md">
+            <pre className="whitespace-pre-wrap text-sm font-mono text-gray-800">
+              {content}
+            </pre>
+          </div>
+        )}
       </div>
       <div className="h-[calc(100vh-8rem)] space-y-4 overflow-y-scroll">
         {deliveryData ? (

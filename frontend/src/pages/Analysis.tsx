@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import AnalysisContent from "../components/AnalysisContent";
@@ -11,7 +11,9 @@ function Analysis() {
     null,
   );
   const [contentData, setContentData] = useState<ContentAnalysis | null>(null);
+  const [textContent, setTextContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasFetched = useRef(false);
   const { rehearsalId } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -28,6 +30,9 @@ function Analysis() {
         const content = response.data.content;
         let deliveryAnalysis = response.data.deliveryAnalysis;
         let contentAnalysis = response.data.contentAnalysis;
+
+        // Load text content
+        setTextContent(content ? content.text : null);
 
         // Load analysis if done
         if (deliveryAnalysis) {
@@ -140,7 +145,10 @@ function Analysis() {
       }
     };
 
-    if (secureUrl) analyze();
+    if (secureUrl && !hasFetched.current) {
+      hasFetched.current = true;
+      analyze();
+    }
   }, [secureUrl]);
 
   const handleRehearseAgain = async () => {
@@ -178,6 +186,7 @@ function Analysis() {
       </NavLink>
       <AnalysisContent
         url={secureUrl}
+        content={textContent}
         deliveryData={deliveryData}
         contentData={contentData}
       />

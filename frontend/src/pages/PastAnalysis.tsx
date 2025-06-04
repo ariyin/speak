@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import axios from "axios";
 import AnalysisContent from "../components/AnalysisContent";
@@ -11,7 +11,9 @@ function PastAnalysis() {
     null,
   );
   const [contentData, setContentData] = useState<ContentAnalysis | null>(null);
+  const [textContent, setTextContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasFetched = useRef(false);
   const { rehearsalId } = useParams();
   const [speechId, setSpeechId] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -24,11 +26,13 @@ function PastAnalysis() {
           `http://localhost:8000/rehearsal/${rehearsalId}`,
         );
         setSpeechId(response.data.speech);
+        const content = response.data.content;
         const deliveryAnalysis = response.data.deliveryAnalysis;
         const contentAnalysis = response.data.contentAnalysis;
         const videoUrl = response.data.videoUrl;
 
         // Load analysis if done
+        setTextContent(content ? content.text : null);
         setDeliveryData(deliveryAnalysis);
         setContentData(contentAnalysis);
         setVideoUrl(videoUrl);
@@ -39,7 +43,10 @@ function PastAnalysis() {
       }
     };
 
-    analyze();
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      analyze();
+    }
   }, []);
 
   if (loading)
@@ -60,6 +67,7 @@ function PastAnalysis() {
       </NavLink>
       <AnalysisContent
         url={videoUrl}
+        content={textContent}
         deliveryData={deliveryData}
         contentData={contentData}
       />
