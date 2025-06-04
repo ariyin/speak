@@ -44,16 +44,13 @@ export default function AnalysisContent({
 
   return (
     <div className="grid h-full grid-cols-2 gap-10">
-      <div className="flex flex-col items-center">
-        <div className="aspect-video w-full">
-          <VideoPlayer url={url} onReady={handleReady} />
-        </div>
-
+      <div className="flex flex-col items-center gap-5">
+        <VideoPlayer url={url} onReady={handleReady} />
         {content && (
-          <div className="mt-4 max-h-[50vh] w-full overflow-y-auto border-t border-gray-200 bg-white p-4 shadow-md">
-            <pre className="font-mono text-sm whitespace-pre-wrap text-gray-800">
-              {content}
-            </pre>
+          <div className="relative h-full w-full overflow-y-auto rounded-xl border-2 border-black">
+            <div className="absolute inset-0">
+              <p className="p-5 whitespace-pre-wrap">{content}</p>
+            </div>
           </div>
         )}
       </div>

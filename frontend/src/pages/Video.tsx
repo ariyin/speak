@@ -126,11 +126,6 @@ function Video() {
             next
           </button>
         </div>
-        {/* {backRoute && (
-          <NavLink to={backRoute}>
-            <button>back</button>
-          </NavLink>
-        )} */}
         {videoFile && !showRecorder && (
           <button
             onClick={clearUpload}
@@ -139,9 +134,6 @@ function Video() {
             clear upload
           </button>
         )}
-        {/* <button onClick={handleNext} disabled={!videoFile}>
-          next
-        </button> */}
       </div>
     </div>
   );
