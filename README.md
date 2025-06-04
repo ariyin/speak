@@ -6,13 +6,6 @@ designed to ease public speaking anxiety and boost your confidence. get targeted
 
 ### frontend
 
-to run:
-
-```bash
-cd frontend
-npm run dev
-```
-
 create a `.env` file in `/frontend` with the following:
 
 ```env
@@ -20,7 +13,21 @@ VITE_CLOUD_NAME=
 VITE_UPLOAD_PRESET=
 ```
 
+to run:
+
+```bash
+cd frontend
+npm run dev
+```
+
 ### backend
+
+create a `.env` file in `/backend` with the following:
+
+```env
+MONGODB_URL=mongodb+srv://<db_username>:<db_password>@cluster0.wddsg5v.mongodb.net/PublicSpeaking?retryWrites=true&w=majority&appName=Cluster0
+PORT=8000
+```
 
 to run:
 
@@ -33,13 +40,6 @@ pip install -r requirements.txt
 python3 main.py
 ```
 
-create a `.env` file in `/backend` with the following:
-
-```env
-MONGODB_URL=mongodb+srv://<db_username>:<db_password>@cluster0.wddsg5v.mongodb.net/PublicSpeaking?retryWrites=true&w=majority&appName=Cluster0
-PORT=8000
-```
-
 ### analysis
 
 create a `.env` file in `/analysis` with the following:
@@ -48,11 +48,20 @@ create a `.env` file in `/analysis` with the following:
 GEMINI_API_KEY=
 ```
 
-Download [ollama](https://ollama.com/download)
+to run:
 
-Run `ollama pull llama3`
+```bash
+cd analysis
+pip install uvicorn
+uvicorn transcribe:app --port 9000
+```
 
-Run `ollama run llama3`
+download [ollama](https://ollama.com/download) and run:
+
+```bash
+ollama pull llama3
+ollama run llama3
+```
 
 ## usage
 

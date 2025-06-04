@@ -89,12 +89,18 @@ function Content() {
             </TooltipProvider>
           </div>
         </div>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="input text here..."
-          className="h-full w-full focus:outline-none"
-        />
+        {contentType && (
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={
+              contentType === "script"
+                ? "paste your full script here. this should be a word-for-word version of what you plan to say in your speech. it helps us analyze how closely your delivery matches your intended message."
+                : "write your outline here. this should be a structured list of key points or topics you want to cover in your speech. it helps us assess how well your delivery aligns with your intended structure and content."
+            }
+            className="h-full w-full focus:outline-none"
+          />
+        )}
       </div>
       <div className="flex justify-between">
         <NavLink to={`/rehearsal/${rehearsalId}/type`}>

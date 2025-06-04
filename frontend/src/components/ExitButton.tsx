@@ -6,6 +6,15 @@ import {
   deleteCurrentRehearsal,
   deleteSpeech,
 } from "../utils/auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 function ExitButton() {
   const navigate = useNavigate();
@@ -56,9 +65,20 @@ function ExitButton() {
   };
 
   return (
-    <button onClick={handleExit} className="justify-self-end">
-      exit
-    </button>
+    <Dialog>
+      <DialogTrigger className="w-fit justify-self-end">exit</DialogTrigger>
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+        <DialogHeader>
+          <DialogTitle>confirm exit</DialogTitle>
+          <DialogDescription>
+            are you sure you want to exit? your progress will not be saved.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <button onClick={handleExit}>exit</button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

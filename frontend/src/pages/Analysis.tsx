@@ -5,6 +5,7 @@ import AnalysisContent from "../components/AnalysisContent";
 import type { DeliveryAnalysis } from "../utils/deliveryAnalysis";
 import type { ContentAnalysis } from "../utils/contentAnalysis";
 import { addRehearsal, getCurrentSpeech } from "../utils/auth";
+import Loading from "./Loading";
 
 function Analysis() {
   const [deliveryData, setDeliveryData] = useState<DeliveryAnalysis | null>(
@@ -161,12 +162,7 @@ function Analysis() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex h-screen items-center justify-center text-center text-gray-400">
-        <h2>analyzing video...</h2>
-      </div>
-    );
+  if (loading) return <Loading text="analyzing video" className="h-screen" />;
 
   return (
     <div className="layout-tb">

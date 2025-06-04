@@ -137,7 +137,7 @@ function RecordingModal({ onClose, onRecorded }: RecordingModalProps) {
     <>
       <video id="camera-preview" autoPlay muted className="relative" />
       {recording && (
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 rounded bg-black/50 px-2 py-1 text-white">
+        <div className="font-gs absolute top-2 left-1/2 -translate-x-1/2 rounded bg-black/50 px-2 py-1 text-white">
           {Math.floor(duration / 60)}:
           {(duration % 60).toString().padStart(2, "0")}
         </div>

@@ -5,6 +5,7 @@ import AnalysisContent from "../components/AnalysisContent";
 import type { DeliveryAnalysis } from "../utils/deliveryAnalysis";
 import type { ContentAnalysis } from "../utils/contentAnalysis";
 import { deleteCurrentRehearsal } from "@/utils/auth";
+import Loading from "./Loading";
 
 function PastAnalysis() {
   const [deliveryData, setDeliveryData] = useState<DeliveryAnalysis | null>(
@@ -42,15 +43,10 @@ function PastAnalysis() {
     analyze();
   }, []);
 
-  if (loading)
-    return (
-      <div className="flex h-screen items-center justify-center text-center text-gray-400">
-        <h2>loading...</h2>
-      </div>
-    );
+  if (loading) return <Loading className="h-screen" />;
 
   return (
-    <div className="grid h-screen grid-rows-[auto_1fr] gap-y-8 p-8">
+    <div className="grid h-screen grid-rows-[auto_1fr] gap-y-8 p-6">
       <NavLink
         to={`/speech/${speechId}/summary`}
         onClick={() => deleteCurrentRehearsal()}

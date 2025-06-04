@@ -115,19 +115,33 @@ function Video() {
           {previewUrl && !showRecorder && <video src={previewUrl} controls />}
         </div>
       </div>
-      <div className="flex justify-between">
-        {backRoute && (
+      <div className="relative">
+        <div className="flex justify-between">
+          {backRoute && (
+            <NavLink to={backRoute}>
+              <button>back</button>
+            </NavLink>
+          )}
+          <button onClick={handleNext} disabled={!videoFile}>
+            next
+          </button>
+        </div>
+        {/* {backRoute && (
           <NavLink to={backRoute}>
             <button>back</button>
           </NavLink>
-        )}
+        )} */}
         {videoFile && !showRecorder && (
-          <button onClick={clearUpload}>clear upload</button>
+          <button
+            onClick={clearUpload}
+            className="absolute top-1/2 left-1/2 w-fit -translate-x-1/2 -translate-y-1/2"
+          >
+            clear upload
+          </button>
         )}
-
-        <button onClick={handleNext} disabled={!videoFile}>
+        {/* <button onClick={handleNext} disabled={!videoFile}>
           next
-        </button>
+        </button> */}
       </div>
     </div>
   );
