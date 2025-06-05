@@ -14,11 +14,13 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import Loading from "./Loading";
 
 function Home() {
   const navigate = useNavigate();
   const [speeches, setSpeeches] = useState<Speech[]>([]);
   const [speechName, setSpeechName] = useState("Untitled Speech");
+  const [loading, setLoading] = useState(true);
 
   const fetchSpeeches = async () => {
     try {
@@ -33,6 +35,8 @@ function Home() {
       }
     } catch (err) {
       console.error("Error fetching speeches:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,21 +71,27 @@ function Home() {
   return (
     <div className="layout-t">
       <div className="flex items-center justify-between">
-        <img src={logo} className="h-12" />
+        <img src={logo} className="h-13" />
         <Dialog>
           <DialogTrigger>create new speech</DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>create new speech</DialogTitle>
               <DialogDescription>
-                <div className="flex flex-col items-start gap-2">
+                <form
+                  className="flex flex-col items-start gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleCreateSpeech();
+                  }}
+                >
                   <label>name</label>
                   <input
                     value={speechName}
                     onChange={(e) => setSpeechName(e.target.value)}
                     className="w-full"
                   />
-                </div>
+                </form>
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -90,7 +100,9 @@ function Home() {
           </DialogContent>
         </Dialog>
       </div>
-      {speeches.length === 0 ? (
+      {loading ? (
+        <Loading className="h-full" />
+      ) : speeches.length === 0 ? (
         <div className="justify-self-center text-center text-gray-400">
           <h1>no speeches available</h1>
           <p className="mt-2">create your first speech to get started!</p>

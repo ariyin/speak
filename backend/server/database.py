@@ -92,6 +92,7 @@ def rehearsal_helper(rehearsal) -> dict:
         "analysis": rehearsal["analysis"],
         "speech": str(rehearsal["speech"]),
         "videoUrl": rehearsal["videoUrl"],
+        "thumbnailUrl": rehearsal.get("thumbnailUrl"),
         "duration": rehearsal.get("duration"),
         "content": rehearsal.get("content"),
         "deliveryAnalysis": rehearsal.get("deliveryAnalysis"),
@@ -118,7 +119,6 @@ async def retrieve_rehearsal(rehearsal_id: str) -> dict:
 
 # convert a video URL to a thumbnail URL by replacing the extension with .jpg
 def get_thumbnail_url(video_url: str) -> str:
-    print(video_url)
     # remove any query parameters
     base_url = video_url.split('?')[0]
     # replace the extension with .jpg
@@ -145,6 +145,7 @@ async def update_rehearsal(rehearsal_id: str, data: dict) -> bool:
                     {"_id": ObjectId(rehearsal["speech"])},
                     {"$set": {"thumbnailUrl": thumbnail_url}}
                 )
+                data["thumbnailUrl"] = thumbnail_url
         
         updated_rehearsal = await rehearsal_collection.update_one(
             {"_id": ObjectId(rehearsal_id)}, 

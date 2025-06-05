@@ -51,10 +51,6 @@
     @apply font-gs;
   }
 
-  li {
-    @apply font-gs pl-5;
-  }
-
   button {
     @apply border-cherry font-gs hover:bg-cherry rounded-2xl border-2 border-solid bg-white px-9 py-3 transition-colors hover:cursor-pointer hover:border-black hover:text-white disabled:cursor-default disabled:border-black disabled:bg-gray-400 disabled:hover:text-black;
   }
@@ -74,12 +70,12 @@
 
 /* ONLY TOP BUTTONS */
 .layout-t {
-  @apply grid h-fit min-h-screen w-screen grid-rows-[auto_1fr] items-center gap-y-8 p-8;
+  @apply grid h-fit min-h-screen w-screen grid-rows-[auto_1fr] items-center gap-y-8 p-6;
 }
 
 /* W TOP AND BOTTOM BUTTONS */
 .layout-tb {
-  @apply grid h-screen w-screen grid-rows-[auto_1fr_auto] items-center gap-y-8 p-8;
+  @apply grid h-screen w-screen grid-rows-[auto_1fr_auto] items-center gap-y-8 p-6;
 }
 
 .selection-card {
@@ -91,7 +87,7 @@
 }
 
 .video-wrapper {
-  @apply relative aspect-video w-full;
+  @apply relative aspect-video;
 }
 
 .video-wrapper video {
@@ -100,4 +96,24 @@
 
 .timestamp {
   @apply text-cherry border-0 bg-transparent p-0 hover:underline;
+}
+
+.loading-text::after {
+  content: "";
+  animation: dots 1.5s steps(3, end) infinite;
+}
+
+@keyframes dots {
+  0% {
+    content: "";
+  }
+  33% {
+    content: ".";
+  }
+  66% {
+    content: "..";
+  }
+  100% {
+    content: "...";
+  }
 }

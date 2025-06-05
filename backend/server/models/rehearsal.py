@@ -15,6 +15,7 @@ class RehearsalSchema(BaseModel):
     analysis: List[str] = []
     speech: PyObjectId
     videoUrl: Optional[str] = None
+    thumbnailUrl: Optional[str] = None
     duration: Optional[float] = None
     content: Optional[Dict[str, str]] = None
     contentAnalysis: Optional[Dict] = None
@@ -29,6 +30,7 @@ class RehearsalSchema(BaseModel):
 class UpdateRehearsalSchema(BaseModel):
     analysis: Optional[List[str]] = None
     videoUrl: Optional[str] = None
+    thumbnailUrl: Optional[str] = None
     duration: Optional[float] = None
     content: Optional[Dict[str, str]] = None
     contentAnalysis: Optional[Dict] = None

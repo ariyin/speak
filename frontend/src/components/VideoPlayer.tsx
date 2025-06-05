@@ -53,7 +53,7 @@ const VideoPlayer = ({ url, onReady }: VideoPlayerProps) => {
       className="cld-video-player cld-video-player-skin-dark"
       controls
       muted
-      style={{ width: "640px", height: "360px" }}
+      style={{ width: "100%", aspectRatio: 16 / 9, height: "100%" }}
     />
   );
 };

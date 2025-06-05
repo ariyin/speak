@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { NavLink, useParams, useNavigate, Navigate } from "react-router-dom";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import RehearsalCard from "../components/RehearsalCard";
 import type { Speech } from "../utils/speechService";
 import type { Rehearsal } from "../utils/rehearsalService";
 import { addRehearsal } from "../utils/auth";
+import logo from "../assets/speak-full.svg";
+import Loading from "./Loading";
 
 function Summary() {
   const { speechId } = useParams();
@@ -27,6 +29,7 @@ function Summary() {
         );
         const rehearsalResponses = await Promise.all(rehearsalPromises);
         const rehearsalData = rehearsalResponses.map((res) => res.data);
+        console.log(rehearsalData);
         setRehearsals(rehearsalData);
       } catch (err) {
         console.error("Error fetching speech:", err);
@@ -58,22 +61,30 @@ function Summary() {
   // loading state
   if (loading || !speech) {
     return (
-      <div className="layout-tb">
-        <NavLink to="/" className="justify-self-end">
-          <button>back to home</button>
-        </NavLink>
-        <div className="flex h-full items-center justify-center">
-          <h2 className="text-gray-400">loading...</h2>
+      <div className="layout-t">
+        <div className="flex justify-between">
+          <NavLink to="/">
+            <img src={logo} className="h-13" />
+          </NavLink>
+          <NavLink to="/">
+            <button>back to home</button>
+          </NavLink>
         </div>
+        <Loading className="h-full" />
       </div>
     );
   }
 
   return (
     <div className="layout-t">
-      <NavLink to="/" className="justify-self-end">
-        <button>back to home</button>
-      </NavLink>
+      <div className="flex justify-between">
+        <NavLink to="/">
+          <img src={logo} className="h-13" />
+        </NavLink>
+        <NavLink to="/">
+          <button>back to home</button>
+        </NavLink>
+      </div>
       <div className="flex flex-col gap-8">
         <div>
           <h1>{speech?.name}</h1>
@@ -93,8 +104,10 @@ function Summary() {
               <div className="w-1/2">
                 <RehearsalCard rehearsal={rehearsal} />
               </div>
-              {/* vertical line */}
-              <div className="bg-cherry h-10 w-0.5" />
+              {/* vertical line - only show if more than one rehearsal */}
+              {rehearsals.length != 1 && (
+                <div className="bg-cherry h-10 w-0.5" />
+              )}
             </div>
           ))}
           <button className="w-fit" onClick={handleAddRehearsal}>
