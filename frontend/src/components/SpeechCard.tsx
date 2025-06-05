@@ -143,11 +143,11 @@ function SpeechCard({
             </div>
           </div>
           <div className="flex flex-col">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm">
               {speech.rehearsals.length} rehearsal
               {speech.rehearsals.length !== 1 ? "s" : ""}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm">
               {(speech.practiceTime / 60).toFixed(1)} minutes of practice
             </p>
           </div>

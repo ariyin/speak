@@ -86,13 +86,17 @@ function Summary() {
         </NavLink>
       </div>
       <div className="flex flex-col gap-8">
-        <div>
+        <div className="flex flex-col gap-3">
           <h1>{speech?.name}</h1>
-          <p className="text-gray-600">
-            {rehearsals.length} rehearsal{rehearsals.length !== 1 ? "s" : ""} |{" "}
-            {speech?.practiceTime ? (speech.practiceTime / 60).toFixed(1) : 0}{" "}
-            minutes of practice
-          </p>
+          <div className="flex gap-3">
+            <p className="tag">
+              {rehearsals.length} rehearsal{rehearsals.length !== 1 ? "s" : ""}
+            </p>
+            <p className="tag">
+              {speech?.practiceTime ? (speech.practiceTime / 60).toFixed(1) : 0}{" "}
+              minutes of practice
+            </p>
+          </div>
         </div>
         <div className="flex w-full flex-col items-center gap-10">
           {/* rehearsal cards */}

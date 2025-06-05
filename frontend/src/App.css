@@ -98,6 +98,10 @@
   @apply text-cherry border-0 bg-transparent p-0 hover:underline;
 }
 
+.tag {
+  @apply rounded-xl border-2 border-gray-400 px-3 py-2;
+}
+
 .loading-text::after {
   content: "";
   animation: dots 1.5s steps(3, end) infinite;
