@@ -2,9 +2,13 @@ import re
 import json
 from json_repair import repair_json
 import time
-from ollama import Client
+#from ollama import Client
+from openai import OpenAI
+from dotenv import load_dotenv
 from collections import Counter
 from typing import List, Dict, Optional
+
+load_dotenv()
 
 FILLER_PROMPT_TEMPLATE = """
 You are given a portion of a spoken transcript. Your task is to extract only the **filler words or phrases** used in context.
@@ -31,7 +35,8 @@ from prompts import (
     content_analysis_script_prompt
 )
 
-client = Client()
+#client = Client()
+client = OpenAI()
 
 def detect_filler_words(result: dict) -> list:
     all_words = result.get("segments")
@@ -49,9 +54,15 @@ def detect_filler_words(result: dict) -> list:
         prompt = FILLER_PROMPT_TEMPLATE.format(text=chunk)
 
         # Send the chunk to Mistral for filler word detection
-        response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
-
-        filler_word_dict = repair_json(response.message.content)
+        #response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+        # swap to gpt
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # or gpt-4o, gpt-3.5-turbo, etc.
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        raw_content = response.choices[0].message.content.strip()
+        filler_word_dict = repair_json(raw_content)
 
         try:
             chunk_result = json.loads(filler_word_dict)
@@ -109,9 +120,14 @@ def analyze_content_outline(outline: str, transcript: List[List[str]]):
     prompt = content_analysis_outline_prompt.format(outline=outline, transcript=transcript)
 
     ## Feed into Llama 3 here
-    response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+    #response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
 
-    filtered_content = repair_json(response.message.content)
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    filtered_content = repair_json(response.choices[0].message.content)
 
     return json.loads(filtered_content)
 
@@ -123,9 +139,13 @@ def analyze_content_script(script: str, transcript: List[List[str]]):
     prompt = content_analysis_script_prompt.format(script = script, transcript=transcript)
 
     ## Feed into Llama 3 here
-    response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+    #response = client.chat(model="llama3", messages=[{"role": "user", "content": prompt}])
+    response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
+        )
 
-    filtered_content = repair_json(response.message.content)
+    filtered_content = repair_json(response.choices[0].message.content)
 
     return json.loads(filtered_content)
 

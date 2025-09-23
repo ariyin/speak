@@ -47,6 +47,7 @@ create a `.env` file in `/analysis` with the following:
 
 ```env
 GEMINI_API_KEY=
+OPENAI_API_KEY =
 ```
 
 to run:
@@ -57,12 +58,12 @@ pip install -r requirements.txt
 uvicorn transcribe:app --port 9000
 ```
 
-download [ollama](https://ollama.com/download) and run:
+<!-- download [ollama](https://ollama.com/download) and run:
 
 ```bash
 ollama pull llama3
 ollama run llama3
-```
+``` -->
 
 ## usage
 

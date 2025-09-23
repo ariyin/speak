@@ -1,2 +1,3 @@
 uvicorn
 json-repair
+openai
