@@ -17,6 +17,7 @@ to run:
 
 ```bash
 cd frontend
+npm install # make sure node is up to date
 npm run dev
 ```
 
@@ -52,7 +53,7 @@ to run:
 
 ```bash
 cd analysis
-pip install uvicorn
+pip install -r requirements.txt
 uvicorn transcribe:app --port 9000
 ```
 
