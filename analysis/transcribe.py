@@ -60,6 +60,53 @@ def get_gemini_client():
     # Initialize the Gemini client (adjust auth if needed)
     return genai.Client(api_key = os.environ["GEMINI_API_KEY"])#, vertexai = True, project=PROJECT_ID, location=LOCATION)
 
+def get_video_duration(file_path: str) -> float:
+    """
+    Returns the duration of a video (in seconds) using ffmpeg.probe.
+    """
+    try:
+        probe = ffmpeg.probe(file_path)
+        # streams[0] should be the first video or audio stream
+        # 'format' always has duration at top level too
+        duration = float(probe['format']['duration'])
+        return duration
+    except Exception as e:
+        print(f"Could not get video duration: {e}")
+        return 0.0
+
+async def get_transcript_from_gemini(video_url: str) -> dict:
+    """
+    Download video and get a verbatim transcript (with filler words) from Gemini.
+    """
+    async with httpx.AsyncClient() as http_client:
+        resp = await http_client.get(video_url)
+    if resp.status_code != 200:
+        raise HTTPException(400, f"Failed to fetch video: {resp.status_code}")
+    video_bytes = resp.content
+
+    mime_type = resp.headers.get("content-type")
+    if not mime_type:
+        mime_type, _ = mimetypes.guess_type(video_url)
+        if not mime_type or not mime_type.startswith("video/"):
+            mime_type = "application/octet-stream"
+
+    transcript_prompt = """
+        Transcribe the following video verbatim, including all filler words and pauses.
+        Return only the transcript text, no commentary, no summarization.
+        """
+
+    client = get_gemini_client()
+    response = client.models.generate_content(
+        model=GEMINI_PRO_MODEL_ID,
+        contents=[
+            transcript_prompt,
+            Part.from_bytes(data=video_bytes, mime_type=mime_type),
+        ]
+    )
+    transcript_text = response.text.strip()
+
+    return transcript_text
+
 ## CONTENT ANALYSIS
 @app.post("/analyze_transcript/")
 # takes in cloudinary URL, and gets transcript along with analysis
@@ -78,24 +125,18 @@ async def upload_video(req: AnalyzeRequest):
     with open(video_path, "wb") as f:
         f.write(resp.content)
 
-    # 3) Extract audio → WAV @16 kHz mono
-    audio_path = UPLOAD_DIR / f"{file_id}.wav"
-    (
-        ffmpeg
-        .input(str(video_path))
-        .output(str(audio_path), vn=None, ac=1, ar=16000, f="wav", acodec="pcm_s16le")
-        .overwrite_output()
-        .run(quiet=True)
-    )
+    # get video duration for speech rate
+    duration_sec = get_video_duration(str(video_path))
+    print(f"Video duration: {duration_sec} seconds")
 
-    # 4) Transcribe with Whisper
-    result = model.transcribe(str(audio_path), language="en")
-    transcript = result.get("text", "").strip()
+    #get transcript from Gemini
+    transcript = await get_transcript_from_gemini(url)
+    # transcript = transcript.get("text", "").strip()
+    print(transcript)
 
-    # 5) Clean up temp files
+    # Clean up temp files
     try:
         video_path.unlink()
-        audio_path.unlink()
     except:
         pass
 
@@ -105,10 +146,10 @@ async def upload_video(req: AnalyzeRequest):
     # return JSONResponse({"transcript": transcript, "transcript_analysis": delivery_analysis})
     print("Video transcript gotten")
     analysis = analyze_transcript(
-        result,
+        transcript,
         outline=req.outline,
         script=req.script,
-        transcript = transcript
+        duration_sec = duration_sec
     )
 
     return JSONResponse(analysis)
@@ -158,7 +199,6 @@ video_analysis_response_schema = {
         "required": ["pros", "cons"]
 
 }
-
 
 # Config for deterministic JSON output
 json_config = GenerateContentConfig(
@@ -213,6 +253,7 @@ async def analyze_body_language_init(req: AnalyzeRequest):
         raise HTTPException(500, f"Could not parse outer JSON: {e}")
     
     return wrapper
+
 
 ## IMPROVEMENT IN BODY ANALYSIS API
 @app.post("/analyze_body_language_improvement/")

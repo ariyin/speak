@@ -38,14 +38,10 @@ from prompts import (
 #client = Client()
 client = OpenAI()
 
-def detect_filler_words(result: dict) -> list:
-    all_words = result.get("segments")
-
-    # Join words to make a full transcript
-    full_transcript = "".join(word["text"] for word in all_words)
+def detect_filler_words(transcript_text: str) -> list:
 
     # Split the transcript into chunks based on sentence-terminating punctuation
-    sentence_chunks = re.split(r'(?<=[.!?]) +', full_transcript)
+    sentence_chunks = re.split(r'(?<=[.!?]) +', transcript_text)
 
     detected_fillers = []
 
@@ -80,7 +76,6 @@ def detect_filler_words(result: dict) -> list:
     return detected_fillers
 
 
-
 def summarize_filler_word_counts(filler_words: List[Dict]) -> Dict[str, int]:
     """
     Takes a list of detected filler words with timestamps and returns a dictionary
@@ -89,30 +84,9 @@ def summarize_filler_word_counts(filler_words: List[Dict]) -> Dict[str, int]:
     return dict(Counter(word.lower() for word in filler_words))
 
 
-
-def calculate_speech_rate(result: dict) -> float:
-    segments = []
-    word_count = 0
-    for segment in result.get("segments", []):
-        segments.append(segment)
-        word_count += len(segment["text"].strip().split())
-
-    if not segments:
-        return 0.0
-
-    start_time = segments[0]["start"]
-    end_time = segments[-1]["end"]
-    duration_sec = end_time - start_time
-
-    if duration_sec <= 0:
-        return 0.0
-
-    words_per_minute = (word_count / duration_sec) * 60
-    return round(words_per_minute, 2)
-
 # CONTENT ANALYSIS 
 
-def analyze_content_outline(outline: str, transcript: List[List[str]]):
+def analyze_content_outline(outline: str, transcript: str):
     """
     Analyzes the content outline and transcript for coherence, flow, and engagement. Gives feedback to user on how
     well what they are saying (the transcript) matches what they are trying to say (the outline).
@@ -131,7 +105,7 @@ def analyze_content_outline(outline: str, transcript: List[List[str]]):
 
     return json.loads(filtered_content)
 
-def analyze_content_script(script: str, transcript: List[List[str]]):
+def analyze_content_script(script: str, transcript: str):
     """
     Analyzes the content script and transcript for coherence, flow, and engagement. Gives feedback to user on how
     well what they are saying (the transcript) matches what they are supposed to say (the script).
@@ -150,16 +124,18 @@ def analyze_content_script(script: str, transcript: List[List[str]]):
     return json.loads(filtered_content)
 
 
-def analyze_transcript(result: dict, outline: Optional[str] = None, script: Optional[str] = None, transcript: Optional[str] = None) -> dict:
+def analyze_transcript(transcript: str, outline: Optional[str] = None, script: Optional[str] = None, duration_sec: Optional[float] = None) -> dict:
+    words = transcript.split()
+    speech_rate = round((len(words) / duration_sec) * 60, 2) if duration_sec else None
     output = {
-        "speech_rate_wpm": calculate_speech_rate(result),
-        "filler_words": summarize_filler_word_counts(detect_filler_words(result))
+        "speech_rate_wpm": speech_rate,
+        "filler_words": summarize_filler_word_counts(detect_filler_words(transcript))
     }
 
     if outline:
-        output["content_analysis"] = analyze_content_outline(outline, [[segment["start"], segment["text"]] for segment in result["segments"]])
+        output["content_analysis"] = analyze_content_outline(outline, transcript)
     if script:
-        output["script_analysis"] = analyze_content_script(script, [[segment["start"], segment["text"]] for segment in result["segments"]])
+        output["script_analysis"] = analyze_content_script(script, transcript)
     
     print(output)
     
